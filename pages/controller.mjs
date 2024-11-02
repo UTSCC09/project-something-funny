@@ -7,12 +7,12 @@ const logoutButton = document.getElementById('logout-button');
 
 // Initial setup to check login status and update UI
 async function initialize() {
-  const status = await checkStatus();
-  if (status.loggedIn) {
-    showLogout(status.email);
-  } else {
-    showLoginRegister();
-  }
+    const { loggedIn } = await response.json();
+    if (loggedIn) {
+        showLogout();
+    } else {
+        showLogin();
+    }
 }
 
 function showLoginRegister() {
