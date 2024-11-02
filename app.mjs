@@ -1,83 +1,67 @@
-import { createClient } from 'redis';
-import bcrypt from 'bcrypt';
+import express from 'express';
+import Redis from 'redis';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import { v4 as uuidv4 } from 'uuid';
 
-// Initialize Redis client
-const redisClient = createClient();
-await redisClient.connect();
+// Initialize the app and Redis client
+const app = express();
+const redisClient = Redis.createClient();
+redisClient.connect();
 
-export default async function handler(req, res) {
-  const { action } = req.query;
+app.use(bodyParser.json());
+app.use(cookieParser());
 
-  if (req.method === 'POST') {
-    const { email, password } = req.body;
+// A simple in-memory user database for demo purposes
+const users = {
+  'user@example.com': 'password123',
+};
 
-    if (action === 'register') {
-      // Handle Registration
-      const existingUser = await redisClient.hGet(`user:${email}`, 'email');
-      if (existingUser) {
-        return res.status(400).json({ message: 'User already exists' });
-      }
+// Route for login
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  // Check if the email and password match
+  if (users[email] && users[email] === password) {
+    const sessionId = uuidv4();
+    
+    // Store the session in Redis
+    await redisClient.set(sessionId, email, 'EX', 3600); // Session expires in 1 hour
+    
+    // Send the session ID as a cookie
+    res.cookie('sessionId', sessionId, { httpOnly: true });
+    res.json({ message: 'Logged in successfully' });
+  } else {
+    res.status(401).json({ message: 'Invalid email or password' });
+  }
+});
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      await redisClient.hSet(`user:${email}`, {
-        email,
-        password: hashedPassword,
-        verified: false,
-      });
+// Route for logout
+app.post('/logout', async (req, res) => {
+  const { sessionId } = req.cookies;
+  if (sessionId) {
+    // Remove the session from Redis
+    await redisClient.del(sessionId);
+    res.clearCookie('sessionId');
+  }
+  res.json({ message: 'Logged out successfully' });
+});
 
-      // Mock sending an email verification
-      return res.status(200).json({ message: 'Registration successful. Please verify your email.' });
-    }
-
-    if (action === 'login') {
-      // Handle Login
-      const storedUser = await redisClient.hGetAll(`user:${email}`);
-      if (!storedUser || !storedUser.password) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-      }
-
-      const isPasswordValid = await bcrypt.compare(password, storedUser.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-      }
-
-      if (storedUser.verified !== 'true') {
-        return res.status(403).json({ message: 'Email not verified' });
-      }
-
-      const sessionToken = uuidv4();
-      await redisClient.set(`session:${sessionToken}`, email, { EX: 3600 });
-
-      res.setHeader('Set-Cookie', `token=${sessionToken}; HttpOnly; Path=/; Max-Age=3600`);
-      return res.status(200).json({ message: 'Login successful' });
-    }
-
-    if (action === 'logout') {
-      // Handle Logout
-      const token = req.cookies.token;
-      if (token) {
-        await redisClient.del(`session:${token}`);
-        res.setHeader('Set-Cookie', 'token=; HttpOnly; Path=/; Max-Age=0');
-        return res.status(200).json({ message: 'Logout successful' });
-      }
-      return res.status(400).json({ message: 'No session found' });
+// Route to check login status
+app.get('/status', async (req, res) => {
+  const { sessionId } = req.cookies;
+  if (sessionId) {
+    const email = await redisClient.get(sessionId);
+    if (email) {
+      return res.json({ loggedIn: true, email });
     }
   }
+  res.json({ loggedIn: false });
+});
 
-  if (req.method === 'GET' && action === 'verify') {
-    // Handle Email Verification
-    const { email } = req.query;
-    const userKey = `user:${email}`;
-    const user = await redisClient.hGetAll(userKey);
+// Start the server
+app.listen(3000, () => {
+  console.log('Backend running on http://localhost:3000');
+});
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
 
-    await redisClient.hSet(userKey, 'verified', 'true');
-    return res.status(200).json({ message: 'Email verified successfully' });
-  }
-
-  return res.status(405).json({ message: 'Method not allowed' });
-}
