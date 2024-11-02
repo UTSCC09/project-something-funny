@@ -1,4 +1,3 @@
-// Base URL for your backend API
 const BASE_URL = 'http://localhost:3000';
 
 export async function login(email, password) {
