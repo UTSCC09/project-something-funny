@@ -17,6 +17,10 @@ const users = {
   'user@example.com': 'password123',
 };
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the Auth Service!');
+});
+
 // Route for login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
