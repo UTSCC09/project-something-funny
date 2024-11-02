@@ -1,4 +1,4 @@
-import { login, register, logout, checkStatus } from './api.mjs';
+import { login, register, logout } from './api.mjs';
 
 // Elements from the DOM
 const loginForm = document.getElementById('login-form');
