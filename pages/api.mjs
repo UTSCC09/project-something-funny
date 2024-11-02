@@ -53,17 +53,3 @@ export async function logout() {
   }
 }
 
-export async function checkStatus() {
-  try {
-    const response = await fetch(`${BASE_URL}/status`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    if (response.ok) {
-      return await response.json();
-    }
-    return { loggedIn: false };
-  } catch (error) {
-    return { loggedIn: false };
-  }
-}
