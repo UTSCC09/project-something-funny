@@ -11,10 +11,8 @@ export default async function handler(req, res) {
 
   const user = JSON.parse(userData);
 
-  // Check password using bcrypt
   const isPasswordValid = await compare(password, user.password);
   if (!isPasswordValid) return res.status(401).json({ error: 'Invalid credentials' }); // 401 Unauthorized
 
-  // You can set a session or token here. For now, just return success.
   res.status(200).json({ message: 'Login successful' });
 }
