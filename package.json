@@ -1,0 +1,36 @@
+{
+    "name": "project-something-funny",
+    "version": "1.0.0",
+    "description": "[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/DnqlZtdt)",
+    "main": "index.js",
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^1.7.7",
+        "bcrypt": "^5.1.1",
+        "body-parser": "^1.20.3",
+        "cookie-parser": "^1.4.7",
+        "dgram": "^1.0.1",
+        "dns": "^0.2.2",
+        "dotenv": "^16.4.5",
+        "express": "^4.21.1",
+        "ioredis": "^5.4.1",
+        "jsonwebtoken": "^9.0.2",
+        "multer": "^1.4.5-lts.1",
+        "net": "^1.0.2",
+        "next": "^15.0.2",
+        "nodemailer": "^6.9.16",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "redis": "^4.7.0",
+        "tls": "^0.0.1",
+        "uuid": "^11.0.2"
+    }
+}
