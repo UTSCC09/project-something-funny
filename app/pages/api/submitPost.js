@@ -1,7 +1,7 @@
 import redis from '../../lib/redis';
 import multer from 'multer';  
 
-const upload = multer({dest:'./uploads/'}); 
+const upload = multer({dest:'./public/uploads/'}); 
 export const config = {api: {bodyParser: false}};
 
 const submitPost = async (req, res) => {
@@ -13,14 +13,19 @@ upload.single('file') (req, res, async (err) => {
     let course = req.query.course;
     let fileUrl = null;
     let uniqueId = await redis.incr('IdDatabase'); 
+    let time = new Date().toISOString();
 
-    await redis.hset(`${course}:text`, uniqueId, text);
-
-    if (req.file) 
+    if (!req.file)
+      await redis.hset(`${course}:posts`, uniqueId, JSON.stringify({time, text}));
+    else {
       fileUrl = `/uploads/${req.file.filename}`;
-    if (fileUrl) 
-      await redis.hset(`${course}:files`, uniqueId, fileUrl);
-
+      const file = req.file;
+      const mimetype  = String(file.mimetype);
+      if (fileUrl) 
+        await redis.hset(`${course}:posts`, uniqueId, JSON.stringify({time, text, fileUrl, mimetype}));
+      else
+        await redis.hset(`${course}:posts`, uniqueId, JSON.stringify({time, text}));
+      }
     return res.status(200).end("Submitted post.");
   } 
   catch (error) {

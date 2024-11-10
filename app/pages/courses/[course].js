@@ -46,6 +46,7 @@ const CoursePage = () => {
 
   return (
     <div>
+      <a href="/">Main menu</a>
       <h1>{course}</h1>
       <h2>Create a Post</h2>
       <div>
@@ -56,7 +57,7 @@ const CoursePage = () => {
               placeholder="Enter text" required/>
           </div>
           <div>
-            <input type="file" accept="video/*,image/*" onChange={addFile}/>
+            <input type="file" accept="video/*,image/*,application/pdf" onChange={addFile}/>
             <button type="submit">Submit</button>
           </div>
         </div>

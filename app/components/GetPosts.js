@@ -1,7 +1,23 @@
+import styles from '../styles/Posts.module.css';
 import {useState, useEffect} from 'react';
+import {useRouter} from 'next/navigation'
+
+const imageExtensions = ['jpg', 'jpeg', 'png'];
+const videoExtensions = ['mp4'];
 
 const GetPosts = ({course}) => {
-  const [posts, setPosts] = useState({text: {}, files: {}});
+  const [posts, setPosts] = useState({});
+  const router = useRouter();
+  
+  const displayFile = (fileUrl, mimetype) => {
+    if (!fileUrl || !mimetype) 
+      return null;
+    if (imageExtensions.some(type => mimetype.includes(type)))
+      return <img className={styles.files} src={fileUrl} alt="Image"/>;
+    else if (videoExtensions.some(type => mimetype.includes(type)))
+      return (<video controls className={styles.files}> <source src={fileUrl} type={mimetype} /></video>);
+    return null;
+  };
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -17,13 +33,22 @@ const GetPosts = ({course}) => {
     fetchPosts();
   }, [course]); 
 
-  // need to format
+  const expandPost = (course, postId) => {
+    router.push(`/courses/${course}/${postId}`); 
+  };
+
   return (
     <div>
       <h2>All Posts</h2>
-      {Object.entries(posts.text).map(([id, text]) => (
-        <div key={id}> {text} </div>
-      ))}     
+      <div className={styles.flex_layout}>
+      {Object.entries(posts).map(([id, {text, fileUrl, mimetype}]) => (
+        <div key={id} className={styles.post_layout}>
+          <button className={styles.right_button} onClick={()=>expandPost(course, id)}>Expand</button>
+          <p className={styles.text}>{text}</p>
+          {displayFile(fileUrl, mimetype)}
+      </div>
+      ))}
+      </div>
     </div>
   );
 };

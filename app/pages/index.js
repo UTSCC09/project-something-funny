@@ -6,9 +6,6 @@ export default function Home() {
         <h1 id="courses">Courses</h1>
         <GetCourses />
       </div>
-      <div>
-        
-      </div>
     </div>
   );
 }
