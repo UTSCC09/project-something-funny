@@ -1,6 +1,7 @@
 import styles from '../../../styles/Posts.module.css';
 import {useRouter} from 'next/router';
 import {useState, useEffect} from 'react';
+import DisplayPDF from "../../../components/DisplayPDF.js"
 const imageExtensions = ['jpg', 'jpeg', 'png'];
 const videoExtensions = ['mp4'];
 const PostPage = () => {
@@ -25,7 +26,7 @@ const PostPage = () => {
       </div>
     );
     else if (mimetype.includes("pdf"))
-      return (<p>PDF</p>)
+      return (<DisplayPDF fileUrl={fileUrl}/>)
     return null;
   };
 
@@ -48,7 +49,13 @@ const PostPage = () => {
     <button onClick={()=>viewAllPosts(course)}>View all posts</button>
     <h1>{course}</h1>
     <p className={styles.text}>{post.text}</p>
+    <canvas id="canvas"></canvas>
     {displayFile(post.fileUrl, post.mimetype)} 
+    <div id="pdf_buttons" className={styles.hide_pdf_buttons}>
+      <button id="prev">Previous</button>
+      <button id="next">Next</button>
+      <p>Page: <span id="page_number"></span> / <span id="total_pages"></span></p>
+    </div>
     <h2>Comments</h2>
     </div>  
   );

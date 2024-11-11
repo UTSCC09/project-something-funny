@@ -41,3 +41,13 @@
 .text {
   margin: 5px;
 }
+
+.hide_pdf_buttons {
+  display: none;
+  visibility: hidden;
+}
+
+.show_pdf_buttons {
+  display: block;
+  visibility: visible;
+}
