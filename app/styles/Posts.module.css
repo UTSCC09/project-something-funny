@@ -3,6 +3,11 @@
   flex-direction: column;
 }
 
+.flex_row_layout {
+  display: flex;
+  flex-direction: row;
+}
+
 .post_layout {
   display: flex;
   flex-direction: column;
@@ -15,10 +20,21 @@
 
 .right_button {
   margin-left: auto;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-right: 5px;
+  margin-top: 5px;
 }
 
 .files {
   width: 40%;
+  margin: 5px;
+}
+
+.large_file {
+  width: 70%;
   margin: 5px;
 }
 

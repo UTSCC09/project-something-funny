@@ -16,6 +16,8 @@ const GetPosts = ({course}) => {
       return <img className={styles.files} src={fileUrl} alt="Image"/>;
     else if (videoExtensions.some(type => mimetype.includes(type)))
       return (<video controls className={styles.files}> <source src={fileUrl} type={mimetype} /></video>);
+    else if (mimetype.includes("pdf"))
+      return (<p>PDF</p>)
     return null;
   };
 

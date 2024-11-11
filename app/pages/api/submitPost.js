@@ -15,18 +15,20 @@ upload.single('file') (req, res, async (err) => {
     let uniqueId = await redis.incr('IdDatabase'); 
     let time = new Date().toISOString();
 
-    if (!req.file)
-      await redis.hset(`${course}:posts`, uniqueId, JSON.stringify({time, text}));
+    if (!req.file) {
+      await redis.hset(`courses:${course}:posts`, uniqueId, JSON.stringify({time, text}));
+      return res.status(200).end("Submitted post.");
+    }
     else {
       fileUrl = `/uploads/${req.file.filename}`;
       const file = req.file;
       const mimetype  = String(file.mimetype);
-      if (fileUrl) 
-        await redis.hset(`${course}:posts`, uniqueId, JSON.stringify({time, text, fileUrl, mimetype}));
-      else
-        await redis.hset(`${course}:posts`, uniqueId, JSON.stringify({time, text}));
+      if (fileUrl) {
+        await redis.hset(`courses:${course}:posts`, uniqueId, JSON.stringify({time, text, fileUrl, mimetype}));}
+      else {
+        await redis.hset(`courses:${course}:posts`, uniqueId, JSON.stringify({time, text})); }
+      return res.status(200).end("Submitted post.");
       }
-    return res.status(200).end("Submitted post.");
   } 
   catch (error) {
     return res.status(500).end("Error: could not add to redis.")

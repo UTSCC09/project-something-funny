@@ -1,7 +1,6 @@
 import styles from '../../../styles/Posts.module.css';
 import {useRouter} from 'next/router';
 import {useState, useEffect} from 'react';
-import pdfjsLib from 'pdfjs-dist';
 const imageExtensions = ['jpg', 'jpeg', 'png'];
 const videoExtensions = ['mp4'];
 const PostPage = () => {
@@ -17,11 +16,16 @@ const PostPage = () => {
     if (!fileUrl || !mimetype) 
       return null;
     if (imageExtensions.some(type => mimetype.includes(type)))
-      return <img src={fileUrl} alt="Image"/>;
+      return <img className={styles.large_file} src={fileUrl} alt="Image"/>;
     else if (videoExtensions.some(type => mimetype.includes(type)))
-      return (<video controls> <source src={fileUrl} type={mimetype} /> </video>);
-    else if (mimetype.includes("pdf")) {
-    }
+      return (
+      <div className={styles.flex_row_layout}>
+        <video controls className={styles.large_file}> <source src={fileUrl} type={mimetype} /></video>
+        <h2>Video Comments</h2>
+      </div>
+    );
+    else if (mimetype.includes("pdf"))
+      return (<p>PDF</p>)
     return null;
   };
 
@@ -41,8 +45,8 @@ const PostPage = () => {
 
   return (
     <div key={postId}>
-    <h1>{course}</h1>
     <button onClick={()=>viewAllPosts(course)}>View all posts</button>
+    <h1>{course}</h1>
     <p className={styles.text}>{post.text}</p>
     {displayFile(post.fileUrl, post.mimetype)} 
     <h2>Comments</h2>

@@ -5,7 +5,7 @@ const getPosts = async (req, res) => {
     let posts = [];
     if (!course)
         return res.status(400).end("No course was given.");
-    posts = await redis.hgetall(`${course}:posts`);
+    posts = await redis.hgetall(`courses:${course}:posts`);
     const parsedPosts = Object.fromEntries(
       Object.entries(posts).map(([id, value]) => {
         const {time, text, fileUrl, mimetype} = JSON.parse(value);

@@ -6,7 +6,7 @@ const getPostById = async (req, res) => {
     if (!course || !postId)
         return res.status(400).end("No course or post id was given.");
 
-    post = await redis.hget(`${course}:posts`, postId);
+    post = await redis.hget(`courses:${course}:posts`, postId);
     return res.status(200).json(JSON.parse(post));
   } 
   catch (error) {

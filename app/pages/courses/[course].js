@@ -56,10 +56,8 @@ const CoursePage = () => {
             <textarea className={styles.input_box} value={text} onChange={changeText} 
               placeholder="Enter text" required/>
           </div>
-          <div>
-            <input type="file" accept="video/*,image/*,application/pdf" onChange={addFile}/>
-            <button type="submit">Submit</button>
-          </div>
+            <input type="file" className={styles.file_button} accept="video/*,image/*,application/pdf" onChange={addFile}/>
+          <button type="submit" className={styles.submit_button}>Submit</button>
         </div>
       </form>
       </div>
