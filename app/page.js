@@ -34,7 +34,7 @@ export default function Home() {
 
         <section style={sectionStyle}>
           <h2 style={sectionHeaderStyle}>Get Started</h2>
-          <p style={startMessageStyle}>To begin exploring the Grand Library, please register or log in first.</p>
+          <p style={startMessageStyle}>To begin exploring the Grand Library, please register or log in first by clicking Account.</p>
         </section>
       </main>
     </div>
