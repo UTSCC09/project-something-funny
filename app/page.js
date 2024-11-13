@@ -34,7 +34,7 @@ export default function Home() {
 
         <section style={sectionStyle}>
           <h2 style={sectionHeaderStyle}>Get Started</h2>
-          <p style={startMessageStyle}>To begin exploring the Grand Library, register or log in through the navbar above.</p>
+          <p style={startMessageStyle}>To begin exploring the Grand Library, please register or log in first.</p>
         </section>
       </main>
     </div>
@@ -43,7 +43,7 @@ export default function Home() {
 
 // Styles
 const mainContainerStyle = {
-  background: 'linear-gradient(to bottom, #00567d, #e1f1f6)', // U of T blue gradient
+  background: 'linear-gradient(to bottom , #e1f1f6, #a8cde8)', 
   minHeight: '100vh',
   fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
 };
@@ -57,7 +57,7 @@ const mainContentStyle = {
 const welcomeStyle = {
   fontSize: '3rem',
   fontWeight: 'bold',
-  color: '#00567d', // U of T blue color
+  color: '#00567d', 
   marginBottom: '1rem',
 };
 
