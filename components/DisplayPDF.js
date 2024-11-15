@@ -1,8 +1,9 @@
 import * as pdfjsLib from 'pdfjs-dist'
+// import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min.mjs";
 import styles from '../styles/Posts.module.css';
-
+import {useEffect} from "react";
 export default function displayPDF(fileUrl) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.entry';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
   
   let pdfDocument = null;
   let pageNumber = 1;

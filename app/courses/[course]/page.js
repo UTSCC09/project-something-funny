@@ -1,5 +1,6 @@
 'use client'
 import styles from '../../../styles/Courses.module.css';
+import globals from '../../../styles/globals.css';
 import GetPosts from '../../components/GetPosts.js';
 import {useRouter} from 'next/navigation';
 import React, {useState} from 'react'
@@ -58,8 +59,10 @@ const CoursePage = ({params}) => {
             <textarea className={styles.input_box} value={text} onChange={changeText} 
               placeholder="Enter text" required/>
           </div>
+          <div>
             <input type="file" className={styles.file_button} accept="video/*,image/*,application/pdf" onChange={addFile}/>
-          <button type="submit" className={styles.submit_button}>Submit</button>
+            <button type="submit" className={styles.submit_button}>Submit</button>
+            </div>
         </div>
       </form>
       </div>

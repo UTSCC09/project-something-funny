@@ -1,5 +1,6 @@
 'use client'
 import GetCourses from '../components/GetCourses.js';
+import globals from '../../styles/globals.css';
 import {useEffect} from 'react'
 export default function Home() {
 

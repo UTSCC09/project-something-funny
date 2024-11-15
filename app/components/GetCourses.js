@@ -33,13 +33,13 @@ export default function GetCourses() {
   let remainingCourses = coursesList.filter(c => !yourCourses.includes(c));
   return (
     <>
-    <div>Enrolled Courses</div>
+    <h2>Enrolled Courses</h2>
     <div className={styles.grid_layout}>
       {yourCourses.map((course, idx) => (
         <button className={styles.course_button} id={course} key={idx} onClick={()=>clickCourse(course)}>{course}</button>
       ))}
       </div>
-    <div>All Courses</div>
+    <h2>All Courses</h2>
     <div className={styles.grid_layout}>
       {remainingCourses.map((course, idx) => (
         <button className={styles.course_button} id={course} key={idx} onClick={()=>clickCourse(course)}>{course}</button>
