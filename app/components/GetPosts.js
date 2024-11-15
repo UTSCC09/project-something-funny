@@ -37,10 +37,9 @@ const GetPosts = ({course, submitted, setSubmitted}) => {
       const posts = await fetchPosts();  
       setSubmitted(false); 
     };
-    if (submitted)
-      updatePostList();
-  }, [submitted, setSubmitted, course, fetchPosts]);
-
+    updatePostList();
+  }, [submitted, course]);
+  
   const expandPost = (course, postId) => {
     router.push(`/courses/${course}/${postId}`); 
   };
