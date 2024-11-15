@@ -1,4 +1,4 @@
-  import redis from '../../lib/redis';
+import redis from '../../lib/redisClient';
 
   export default async function addCourses(req, res) {
   if (req.method === 'POST') {
