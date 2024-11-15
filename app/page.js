@@ -1,10 +1,18 @@
+'use client'
 import Navbar from "../components/Navbar";
 import Link from "next/link";
-
+import {useRouter} from "next/navigation";
 export default function Home() {
+  const router = useRouter();
+  const pushToCourses = () => {
+    router.push(`/courses`); 
+  };
   return (
     <div style={mainContainerStyle}>
       <Navbar />
+      <section>
+        <button onClick={pushToCourses}>Courses</button>
+      </section>
       <main style={mainContentStyle}>
         <h1 style={welcomeStyle}>Welcome to the University of Toronto Grand Library</h1>
         <p style={descriptionStyle}>

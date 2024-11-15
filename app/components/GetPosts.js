@@ -1,4 +1,4 @@
-import styles from '../styles/Posts.module.css';
+import styles from '../../styles/Posts.module.css';
 import {useState, useEffect} from 'react';
 import {useRouter} from 'next/navigation'
 

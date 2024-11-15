@@ -1,5 +1,5 @@
 import styles from '../../styles/Courses.module.css';
-import GetPosts from '../../components/GetPosts.js';
+import GetPosts from '../../../components/GetPosts.js';
 import {useRouter} from 'next/router';
 import {useState} from 'react'
 

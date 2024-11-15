@@ -1,3 +1,4 @@
+'use client'
 import GetCourses from '../components/GetCourses.js';
 import {useEffect} from 'react'
 export default function Home() {

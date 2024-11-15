@@ -1,9 +1,8 @@
 'use client'
-import styles from '../../styles/Courses.module.css';
+import styles from '../styles/Courses.module.css';
 import {useRouter} from 'next/navigation'
 import {useState, useEffect} from 'react';
 export default function GetCourses() {
-  console.log("here");
   const router = useRouter();
   const [coursesList, setCoursesList] = useState([]);
   
