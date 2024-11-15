@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation'
 const imageExtensions = ['jpg', 'jpeg', 'png'];
 const videoExtensions = ['mp4'];
 
-const GetPosts = ({course}) => {
+const GetPosts = ({course, submitted, setSubmitted}) => {
   const [posts, setPosts] = useState({});
   const router = useRouter();
   
@@ -21,19 +21,25 @@ const GetPosts = ({course}) => {
     return null;
   };
 
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch(`/api/getPosts?course=${course}`);
+      const fetchedData = await response.json();
+      setPosts(fetchedData);  
+    } 
+    catch (error) {
+      return (error);
+    } 
+  };
+
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch(`/api/getPosts?course=${course}`);
-        const fetchedData = await response.json();
-        setPosts(fetchedData);  
-      } 
-      catch (error) {
-        return (error);
-      } 
+    const updatePostList = async () => {
+      const posts = await fetchPosts();  
+      setSubmitted(false); 
     };
-    fetchPosts();
-  }, [course]); 
+    if (submitted)
+      updatePostList();
+  }, [submitted, setSubmitted, course, fetchPosts]);
 
   const expandPost = (course, postId) => {
     router.push(`/courses/${course}/${postId}`); 

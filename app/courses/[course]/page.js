@@ -66,7 +66,7 @@ const CoursePage = ({params}) => {
         </div>
       </form>
       </div>
-      <GetPosts course={course}/>
+      <GetPosts course={course} submitted={submitted} setSubmitted={setSubmitted}/>
     </div>
   );
 };
