@@ -3,6 +3,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "dev:frontend": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:backend": "node server.js -p 5000",
     "start": "next start"
   },
   "dependencies": {

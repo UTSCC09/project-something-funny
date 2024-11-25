@@ -5,6 +5,7 @@ import { Input } from "../../../components/ui/input";
 import { FaGoogle } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import { auth } from '../../../firebase-auth/index';
+import Cookie from 'js-cookie';
 import {
   signInWithPopup,
   GoogleAuthProvider,
@@ -34,7 +35,7 @@ const SignIn = () => {
         const data = await response.json();
         console.log(data.userData);
         setUser(data.userData)
-
+        Cookie.set('userEmail', data.userData.email, { expires: 7 });
         router.push('/');
       } else {
         const errorData = await response.json();

@@ -7,11 +7,15 @@ export default function Home() {
   const pushToCourses = () => {
     router.push(`/courses`); 
   };
+  const pushToMessaging = () => {
+    router.push(`/messages`); 
+  };
   return (
     <div style={mainContainerStyle}>
       <Navbar />
       <section>
         <button onClick={pushToCourses}>Courses</button>
+        <button onClick={pushToMessaging}>Messaging</button>
       </section>
       <main style={mainContentStyle}>
         <h1 style={welcomeStyle}>Welcome to the University of Toronto Grand Library</h1>
