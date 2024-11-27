@@ -11,9 +11,11 @@ export default function Messages() {
   const [currentCourse, setCurrentCourse] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false); 
+  const [index, setIndex] = useState(0);
   const email = Cookie.get('userEmail');
   const chatBoxRef = useRef(null);
   const socketRef = useRef(null);
+
   
   useEffect(() => {
     socketRef.current = io('http://localhost:5000'); 
@@ -52,9 +54,10 @@ export default function Messages() {
   const joinCourse = async (course) => {
     setCurrentCourse(course);
     socketRef.current.emit('joinCourse', course);
-    const response = await fetch(`/api/getMessages?course=${course}&index=${0}`);
+    const response = await fetch(`/api/getMessages?course=${course}&index=${index}`);
     if (response.ok) {
       const data = await response.json();
+      setIndex(index+1);
       setMessages((pastMessages) => ({...pastMessages, [course]: data.messages}));
     }
   };
@@ -66,7 +69,7 @@ export default function Messages() {
     setLoading(true);
     const countMessages = messages[course].length;
     try {
-      const response = await fetch(`/api/getMessages?course=${course}&index=${Math.floor(countMessages / 10)}`);
+      const response = await fetch(`/api/getMessages?course=${course}&index=${index}`);
       if (response.ok) {
         const data = await response.json();
         setMessages((pastMessages) => ({...pastMessages, [course]: [...data.messages, ...(pastMessages[course] || [])]}));
