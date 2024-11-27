@@ -35,34 +35,36 @@ export default function Messages() {
     }
     getEnrolledCourses();
     
-    socketRef.current.on('receiveMessage', (message) => {
+    socketRef.current.on('receiveMessage', (messageData) => {
       setMessages((prevMessages) => {
-        const {course, message, sender} = message;
-        return {
-          ...prevMessages, [course]: [...(prevMessages[course] || []), {sender, message}],
-        };
+        const {course, message, sender, time} = messageData;
+        return {...prevMessages, [course]: [...(prevMessages[course] || []), {sender, message, time}]};
       });
     });
+
+
     return () => {
       socketRef.current.disconnect();
     };
   }, [email]);
 
-  const joinCourse = (course) => {
+  const joinCourse = async (course) => {
     setCurrentCourse(course);
     socketRef.current.emit('joinCourse', course);
+    const response = await fetch(`/api/getMessages?course=${course}`);
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+      setMessages((pastMessages) => ({...pastMessages, [course]: data.messages}));
+    }
   };
 
   const sendMessage = () => {
-    if (newMessage.trim()) {
-      socketRef.current.emit('sendMessage', {
-        course: currentCourse,
-        message: newMessage,
-        sender: email,
-      });
-      setNewMessage('');
-    }
-  };
+    if (newMessage) {
+        socketRef.current.emit('sendMessage', {course: currentCourse, message: newMessage, sender: email});
+        setNewMessage('');
+      }
+    };
 
   return (
     <div>
@@ -79,11 +81,14 @@ export default function Messages() {
             <h2>{currentCourse} Groupchat</h2>
             <div className="space-y-4">
               <div>
-                {(messages[currentCourse] || []).map((msg, idx) => (
+                {(messages[currentCourse] || []).map((message, idx) => {
+                  const item = JSON.parse(message);
+                  return (
                   <div key={idx} className="message">
-                    <p>{msg.sender}</p>: {msg.message}
+                    <p>{item.sender} {item.time}</p>: {item.message}
                   </div>
-                ))}
+                  )
+                })}
               </div>
               <div className="message-input">
                 <input 

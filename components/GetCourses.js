@@ -52,6 +52,23 @@ export default function GetCourses() {
     router.push(`/courses/${course}`); 
   };
 
+  const unenroll = async ({email, course}) => {
+    try {
+      const response = await fetch('/api/unenrollFromCourse', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({email, course}),
+      });
+      if (response.ok)
+        setEnrolledCourses((allCourses) => allCourses.filter((c) => c !== course));
+    } 
+    catch (error) {
+      console.log("Could not unenroll from course");
+    }
+  };
+
   const enroll = async ({email, course}) => {
     try {
       const response = await fetch('/api/enrollInCourse', {
@@ -62,9 +79,8 @@ export default function GetCourses() {
         body: JSON.stringify({email, course}),
       });
       const data = await response.json();
-      if (response.ok) {
-        setenrolledCourses((prevCourses) => [...prevCourses, course]);
-      }
+      if (response.ok)
+        setenrolledCourses((allCourses) => [...allCourses, course]);
     } 
     catch (error) {
       console.log("Could not enroll in course");
@@ -79,9 +95,12 @@ export default function GetCourses() {
         <h2 className="text-2xl font-semibold mb-4">Enrolled Courses</h2>
         <div className="flex flex-wrap gap-4">
           {enrolledCourses.map((course, idx) => (
-            <Button key={idx} variant="primary" onClick={() => clickCourse(course)}>
-              {course}
-            </Button>
+             <div key={idx}>
+              <Button variant="primary" onClick={() => clickCourse(course)}>
+                {course}
+              </Button>
+              <Button onClick={() => unenroll({email, course})}>Unenroll</Button>
+            </div>
           ))}
         </div>
       </div>
