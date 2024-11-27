@@ -3,14 +3,16 @@ import { useState, useEffect, useRef } from "react";
 import Cookie from 'js-cookie';
 import { Button } from '@/components/ui/button';
 import io from 'socket.io-client';
+import styles from "styles/messages.module.css"
 
 export default function Messages() {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [messages, setMessages] = useState({});
   const [currentCourse, setCurrentCourse] = useState(null);
   const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(false); 
   const email = Cookie.get('userEmail');
-  
+  const chatBoxRef = useRef(null);
   const socketRef = useRef(null);
   
   useEffect(() => {
@@ -42,7 +44,6 @@ export default function Messages() {
       });
     });
 
-
     return () => {
       socketRef.current.disconnect();
     };
@@ -51,11 +52,31 @@ export default function Messages() {
   const joinCourse = async (course) => {
     setCurrentCourse(course);
     socketRef.current.emit('joinCourse', course);
-    const response = await fetch(`/api/getMessages?course=${course}`);
+    const response = await fetch(`/api/getMessages?course=${course}&index=${0}`);
     if (response.ok) {
       const data = await response.json();
-      console.log(data);
       setMessages((pastMessages) => ({...pastMessages, [course]: data.messages}));
+    }
+  };
+
+
+  const loadMessages = async (course) => {
+    if (loading) 
+      return;
+    setLoading(true);
+    const countMessages = messages[course].length;
+    try {
+      const response = await fetch(`/api/getMessages?course=${course}&index=${Math.floor(countMessages / 10)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMessages((pastMessages) => ({...pastMessages, [course]: [...data.messages, ...(pastMessages[course] || [])]}));
+      }
+    } 
+    catch (err) {
+        console.error(err);
+    } 
+    finally {
+      setLoading(false);
     }
   };
 
@@ -65,6 +86,34 @@ export default function Messages() {
         setNewMessage('');
       }
     };
+
+  const dateFormatter = (str) => {
+    const date = new Date(str);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const h = String(date.getUTCHours()).padStart(2, '0');
+    const min = String(date.getUTCMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}:${h}:${min}`;
+  }
+    
+  // chat scroll feature
+  useEffect(() => {
+    const chatBox = chatBoxRef.current;
+    if (!chatBox) 
+      return;
+    const handleScroll = () => {
+      const scrollTop = chatBox.scrollTop;
+      const maxScrollTop = chatBox.scrollHeight - chatBox.clientHeight;
+      if (!loading && (scrollTop) + maxScrollTop <= 1 &&  (scrollTop) + maxScrollTop >= -1) {
+        loadMessages(currentCourse);
+      }
+    };
+    chatBox.addEventListener("scroll", handleScroll);
+    return () => {
+      chatBox.removeEventListener("scroll", handleScroll);
+    };
+  }, [loading, messages]);
 
   return (
     <div>
@@ -80,15 +129,16 @@ export default function Messages() {
           <div>
             <h2>{currentCourse} Groupchat</h2>
             <div className="space-y-4">
-              <div>
+              <div className={styles.chat_container} ref={chatBoxRef}>
+                <div> 
                 {(messages[currentCourse] || []).map((message, idx) => {
-                  const item = JSON.parse(message);
                   return (
-                  <div key={idx} className="message">
-                    <p>{item.sender} {item.time}</p>: {item.message}
+                  <div key={idx}>
+                    <p>{message.sender} {dateFormatter(message.date)}</p>{message.message}
                   </div>
                   )
                 })}
+                </div>
               </div>
               <div className="message-input">
                 <input 

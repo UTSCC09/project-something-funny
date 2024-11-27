@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
     const data = JSON.stringify(dbData);
     const db = `courses:${course}:messages`;
     await redis.sadd(db, data);
-    io.emit('receiveMessage', {course, ...data});
+    io.emit('receiveMessage', {course, ...dbData});
   });
 
   socket.on('disconnect', () => {
