@@ -5,6 +5,7 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
+const {v4: uuidv4} = require('uuid');
 
 const redis = new Redis({
   host: 'localhost', 
@@ -26,7 +27,6 @@ app.use(cors({
 
   
 io.on('connection', (socket) => {
-  console.log('New user is now connected');
 
   socket.on('joinCourse', (course) => {
     socket.join(course);
@@ -34,12 +34,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async ({course, message, sender}) => {
+    const messageId = uuidv4(); 
     const date = new Date().toISOString();
-    const dbData = {message, sender, date};
-    const data = JSON.stringify(dbData);
+    const dbData = {messageId, message, sender, date};;
     const db = `courses:${course}:messages`;
-    await redis.sadd(db, data);
+    await redis.hset(db, messageId, JSON.stringify(dbData));
     io.emit('receiveMessage', {course, ...dbData});
+  });
+
+  socket.on('editMessage', async ({course, message, sender, messageId, date}) => {
+    const dbData = {messageId, message, sender, date};
+    const db = `courses:${course}:messages`;
+    await redis.hset(db, messageId, JSON.stringify(dbData));
+    io.emit('receiveEditedMessage', {course, ...dbData});
   });
 
   socket.on('disconnect', () => {

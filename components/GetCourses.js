@@ -62,7 +62,7 @@ export default function GetCourses() {
         body: JSON.stringify({email, course}),
       });
       if (response.ok)
-        setEnrolledCourses((allCourses) => allCourses.filter((c) => c !== course));
+        setenrolledCourses((allCourses) => allCourses.filter((c) => c !== course));
     } 
     catch (error) {
       console.log("Could not unenroll from course");
@@ -95,7 +95,7 @@ export default function GetCourses() {
         <h2 className="text-2xl font-semibold mb-4">Enrolled Courses</h2>
         <div className="flex flex-wrap gap-4">
           {enrolledCourses.map((course, idx) => (
-             <div key={idx}>
+             <div key={course}>
               <Button variant="primary" onClick={() => clickCourse(course)}>
                 {course}
               </Button>

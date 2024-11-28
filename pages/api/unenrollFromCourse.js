@@ -1,6 +1,6 @@
 import redis from '../../lib/redisClient';
 
-export default async function enroll(req, res) {
+export default async function unenroll(req, res) {
   if (req.method === 'DELETE') {
     const {email, course} = req.body;
     if (!email || !course)
@@ -8,7 +8,9 @@ export default async function enroll(req, res) {
 
     try {
       const db = `users:${email}:enrolledCourses`;
-      await redis.del(db, course);
+      const output = await redis.srem(db, 0, course);
+      if (output === 0)
+        return res.status(404).json({ success: false, message: `Could not remove user from course` })
       return res.status(200).json({ success: true, message: `Removed from course` });
     } 
     catch (error) {

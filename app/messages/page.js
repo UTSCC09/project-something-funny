@@ -4,6 +4,10 @@ import Cookie from 'js-cookie';
 import { Button } from '@/components/ui/button';
 import io from 'socket.io-client';
 import styles from "styles/messages.module.css"
+import MessageComponent from "./components/MessageComponent.js"
+import {DropdownMenu, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuItem, 
+  DropdownMenuSeparator, DropdownMenuContent } from '../../components/ui/dropdown-menu'
+import { Textarea } from '@/components/ui/textarea'; 
 
 export default function Messages() {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -41,8 +45,21 @@ export default function Messages() {
     
     socketRef.current.on('receiveMessage', (messageData) => {
       setMessages((prevMessages) => {
-        const {course, message, sender, time} = messageData;
-        return {...prevMessages, [course]: [...(prevMessages[course] || []), {sender, message, time}]};
+        const {course, message, sender, date, messageId} = messageData;
+        return {...prevMessages, [course]: [...(prevMessages[course] || []), {sender, message, date, messageId}]};
+      });
+    });
+
+    socketRef.current.on('receiveEditedMessage', (messageData) => {
+      setMessages(prevMessages => {
+        const {course, message, sender, date, messageId} = messageData;
+        return {...prevMessages, [course]: prevMessages[course].map((m) => {
+            if (m.messageId === messageId)
+              return {...m, message: message};
+            else
+              return m;
+          }),
+        };
       });
     });
 
@@ -53,6 +70,7 @@ export default function Messages() {
 
   const joinCourse = async (course) => {
     setCurrentCourse(course);
+    setIndex(0);
     socketRef.current.emit('joinCourse', course);
     const response = await fetch(`/api/getMessages?course=${course}&index=${index}`);
     if (response.ok) {
@@ -67,11 +85,11 @@ export default function Messages() {
     if (loading) 
       return;
     setLoading(true);
-    const countMessages = messages[course].length;
     try {
       const response = await fetch(`/api/getMessages?course=${course}&index=${index}`);
       if (response.ok) {
         const data = await response.json();
+        setIndex(index+1);
         setMessages((pastMessages) => ({...pastMessages, [course]: [...data.messages, ...(pastMessages[course] || [])]}));
       }
     } 
@@ -89,16 +107,6 @@ export default function Messages() {
         setNewMessage('');
       }
     };
-
-  const dateFormatter = (str) => {
-    const date = new Date(str);
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const h = String(date.getUTCHours()).padStart(2, '0');
-    const min = String(date.getUTCMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}:${h}:${min}`;
-  }
     
   // chat scroll feature
   useEffect(() => {
@@ -120,31 +128,43 @@ export default function Messages() {
 
   return (
     <div>
-      <h1>Messages</h1>
+      <h1 className="text-3xl mb-5">Messages</h1>
       <div className="space-y-8">
-        <div>
+      <DropdownMenu>
+        <DropdownMenuTrigger>{'Course Group Chats'}</DropdownMenuTrigger>
+        <DropdownMenuContent>
           {enrolledCourses.map((course, idx) => (
-            <Button key={idx} variant="primary" onClick={() => joinCourse(course)}> {course} </Button>
+            <div key={idx}>
+            <DropdownMenuLabel>
+              <Button key={idx} onClick={() => joinCourse(course)}> {course} </Button>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            </div>
           ))}
-        </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      </div>
+      <div >
         
         {currentCourse && (
           <div>
-            <h2>{currentCourse} Groupchat</h2>
+            <h2 className="mt-5">{currentCourse} Groupchat</h2>
             <div className="space-y-4">
               <div className={styles.chat_container} ref={chatBoxRef}>
                 <div> 
-                {(messages[currentCourse] || []).map((message, idx) => {
+                {(messages[currentCourse] || []).map((message, idx) => {            
                   return (
                   <div key={idx}>
-                    <p>{message.sender} {dateFormatter(message.date)}</p>{message.message}
-                  </div>
+                    <MessageComponent key={message.messageId} messageId={message.messageId}
+                        message={message.message} date={message.date} sender={message.sender} currentUser={email}
+                        initialReactions={message.reactions} course={currentCourse}/>
+                    </div>
                   )
                 })}
                 </div>
               </div>
               <div className="message-input">
-                <input 
+                <Textarea 
                   type="text" value={newMessage} 
                   onChange={(change) => setNewMessage(change.target.value)} 
                   placeholder="Enter in a message" />
