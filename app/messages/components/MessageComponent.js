@@ -3,26 +3,27 @@ import Picker from 'emoji-picker-react';
 import styles from "styles/messages.module.css"
 import { Card } from '@/components/ui/card'; 
 import { Textarea } from '@/components/ui/textarea'; 
+import Dateformatter from './DateFormatter.js'
 import io from 'socket.io-client';
 
-const MessageComponent = ({messageId, course, message, date, sender, initialReactions, currentUser}) => {
+const MessageComponent = ({messageId, course, message, date, sender, initialReactions, currentUser, originalMessage,
+  originalSender, originalMessageId, replied, socket, editStatus}) => {
+
+  // used for reactions
   const [displayEmojis, setDisplayEmojis] = useState(false);
   const [currentEmoji, setCurrentEmoji] = useState(null);
   const [reactions, setReactions] = useState(initialReactions || []);
-  const [replying, setReplying] = useState(false);
+  // used for message editing
   const [editing, setEditing] = useState(false);
   const [editedMessage, setEditedMessage] = useState(message);
-  const [editStatus, setEditStatus] = useState(false);
+  // used for message reply
+  const [replying, setReplying] = useState(false);
   const [replyMessage, setReplyMessage] = useState('');
-  const socketRef = useRef(null);
-    
+
   useEffect(() => {
-    socketRef.current = io('http://localhost:5000'); 
-    socketRef.current.on('messageUpdated', (update) => {
-      if (update.messageId === messageId) {
-        setEditStatus(true);
-        setEditedMessage(update.editedMessage);
-      }
+    socket.on('updatedReactions', (data) => {
+      if (data.messageId === messageId && data.course === course)
+        setReactions(data.reactions);
     });
   });
 
@@ -35,76 +36,62 @@ const MessageComponent = ({messageId, course, message, date, sender, initialReac
           setReactions(data.reactions);
       } 
       catch (error) {
-        setEmojiReactions(null);
+        setReactions(null);
       }
     };
-
     fetchReactions();
-  }, [messageId, course]);
+  }, [course]);
 
   const handleEmojiClick = async (event) => {
     const emoji = event.emoji;
     setCurrentEmoji(emoji);
-    const response = await fetch(`/api/submitReaction`, {
-        method: 'POST',
-        body: JSON.stringify({messageId, course, emoji}),
-        headers: {'Content-Type': 'application/json'},
-    });
-
-    if (response.ok) {
-      setReactions((r) => {
-        const newReactions = { ...r};
-        newReactions[emoji] = (newReactions[emoji] || 0) + 1; 
-        return newReactions;
-      });
-      setDisplayEmojis(false);
-    }
+    socket.emit('reactedToMessage', { course, messageId, emoji });
   };
 
-  const dateFormatter = (str) => {
-    if (str === undefined)
-      return;
-    const date = new Date(str);
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const h = String(date.getUTCHours()).padStart(2, '0');
-    const min = String(date.getUTCMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}:${h}:${min}`;
-  }
-
-  const handleReply = async (sender, message, currentUser, replyMessage) => {
+  const handleReply = async (sender, message, currentUser, replyMessage, originalMessageId) => {
     let trimOldMessage = message.length > 100 ? message.substring(0, 100) : message;
-    let newMessage = "Reply to: " + sender + " " + replyMessage + "\n Original content: " + trimOldMessage;
-    socketRef.current.emit('sendMessage', {course: course, message: newMessage, sender: currentUser,
-      date: date});
+    socket.emit('replyMessage', {course: course, message: replyMessage, sender: currentUser,
+      date: date, originalMessage: trimOldMessage, originalSender: sender, originalMessageId: originalMessageId});
     setReplyMessage('');
     setReplying(false);
   };
 
   const handleEdit = async () => {
-    socketRef.current.emit('editMessage', {course: course, message:editedMessage, sender:currentUser,
+    socket.emit('editMessage', {course: course, message:editedMessage, sender:currentUser,
     messageId: messageId, date:date});
-    setEditStatus(true);
     setEditing(false);
+  };
+
+  const scrollToOriginalMessage = (messageId) => {
+    const elem = document.getElementById(messageId);
+    if (elem)
+      elem.scrollIntoView({behavior: 'smooth'});
   };
 
   return (
     <div className={sender === currentUser ? 'flex justify-end' : 'flex justify-start'}>
-    <Card className={sender === currentUser ? 'mb-6 mx-5 p-4 inline-block bg-sky-200' : 'mb-6 mx-5 p-4 inline-block'}>
-      <p className="font-semibold mb-2">{sender}</p> <p className="text-xs">{dateFormatter(date)}</p>
+    <Card id={messageId} 
+      className={sender === currentUser ? 'mb-6 mx-5 p-4 inline-block bg-sky-200' : 'mb-6 mx-5 p-4 inline-block'}>
+      <p className="font-semibold mb-2">{sender}</p> <p className="text-xs">{Dateformatter(date)}</p>
       {editing ?(
           <div>
             <Textarea value={editedMessage} onChange={(e) => setEditedMessage(e.target.value)}/>
             <button onClick={handleEdit}>Save</button>
           </div>
         ): 
-        (<div>{message} {editStatus && <p className="text-xs text-gray-500">(Edited)</p>}</div>)} 
-        {currentUser === sender && !editing && (
-          <button className="text-sm" onClick={() => setEditing(true)}>Edit</button>
-        )}
+        (<div>
+        {replied && <p className="text-xs">Replied to: {originalSender}</p>}
+        <p className="text-lg">{message}</p>
+        {replied && <p className="text-xs">
+          <button onClick={() => scrollToOriginalMessage(originalMessageId)}>
+            Original Message: {originalMessage}
+          </button> </p>}
+        {editStatus && <p className="text-xs text-gray-500">(Edited)</p>}</div>)} 
       <div>
-        <button className="font-semibold text-sm" onClick={() => setDisplayEmojis(!displayEmojis)}>React</button>
+        {currentUser === sender && !editing && (
+          <button className="text-sm mr-1" onClick={() => setEditing(true)}>Edit</button>
+        )}
+        <button className="font-semibold text-sm mx-1" onClick={() => setDisplayEmojis(!displayEmojis)}>React</button>
         {displayEmojis && (
           <div className="emoji-picker">
             <Picker reactionsDefaultOpen={true} onEmojiClick={handleEmojiClick} />
@@ -115,12 +102,14 @@ const MessageComponent = ({messageId, course, message, date, sender, initialReac
               <p className="text-sm">{emoji}({count}) </p>
             </div>
           ))}
-          <button className="text-sm" onClick={()=>setReplying(!replying)}>Reply</button>
+          <button className="text-sm mx-1" onClick={()=>setReplying(!replying)}>Reply</button>
           {replying && (
             <div>
               <Textarea onChange={(e)=>setReplyMessage(e.target.value)}
                 value={replyMessage} placeholder="Enter in your reply"/>
-              <button onClick={()=>handleReply(sender, message, currentUser, replyMessage)}>Submit Reply</button>
+              <button onClick={()=>handleReply(sender, message, currentUser, replyMessage, messageId)}>
+                Submit Reply
+              </button>
             </div>
           )}
       </div>

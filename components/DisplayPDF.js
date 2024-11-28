@@ -12,7 +12,8 @@ export default function DisplayPDF({ fileUrl }) {
 
   useEffect(() => {
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.entry';
+    //pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-dist/build/pdf.worker.entry';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
     let pdfDocument = null;
     let pageNumber = 1;

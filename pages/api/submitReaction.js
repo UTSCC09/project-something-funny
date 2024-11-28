@@ -4,7 +4,7 @@ export default async function submitReaction(req, res) {
   console.log(req.body);
   if (req.method === "POST") {
     const {course, messageId, emoji} = req.body;
-    console.log(course, messageId, emoji);
+
     if (!course || !messageId || !emoji) 
       return res.status(400).json({success: false, message: 'Must include course, message, and emoji'});
 

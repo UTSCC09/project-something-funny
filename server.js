@@ -42,11 +42,32 @@ io.on('connection', (socket) => {
     io.emit('receiveMessage', {course, ...dbData});
   });
 
+  socket.on('replyMessage', async ({course, message, sender, originalMessage, originalSender, originalMessageId}) => {
+    const messageId = uuidv4(); 
+    const date = new Date().toISOString();
+    const replied = true;
+    const dbData = {messageId, message, sender, date, originalMessage, originalSender, originalMessageId, replied};
+    const db = `courses:${course}:messages`;
+    await redis.hset(db, messageId, JSON.stringify(dbData));
+    io.emit('receiveMessage', {course, ...dbData});
+  });
+
   socket.on('editMessage', async ({course, message, sender, messageId, date}) => {
-    const dbData = {messageId, message, sender, date};
+    const editStatus = true;
+    const dbData = {messageId, message, sender, date, editStatus};
     const db = `courses:${course}:messages`;
     await redis.hset(db, messageId, JSON.stringify(dbData));
     io.emit('receiveEditedMessage', {course, ...dbData});
+  });
+
+  socket.on('reactedToMessage', async (data) => {
+    const {course, messageId, emoji} = data;
+    if (!course || !messageId || !emoji) 
+      return;
+    const db = `courses:${course}:messages:${messageId}:reactions`;
+    await redis.hincrby(db, emoji, 1);
+    const reactions = await redis.hgetall(`courses:${course}:messages:${messageId}:reactions`);
+    io.emit('updatedReactions', {messageId, course, reactions});
   });
 
   socket.on('disconnect', () => {

@@ -19,7 +19,6 @@ export default function Messages() {
   const email = Cookie.get('userEmail');
   const chatBoxRef = useRef(null);
   const socketRef = useRef(null);
-
   
   useEffect(() => {
     socketRef.current = io('http://localhost:5000'); 
@@ -45,17 +44,19 @@ export default function Messages() {
     
     socketRef.current.on('receiveMessage', (messageData) => {
       setMessages((prevMessages) => {
-        const {course, message, sender, date, messageId} = messageData;
-        return {...prevMessages, [course]: [...(prevMessages[course] || []), {sender, message, date, messageId}]};
+        const {course, message, sender, date, messageId, originalMessage, 
+               originalSender, replied, originalMessageId} = messageData;
+        return {...prevMessages, [course]: [...(prevMessages[course] || []), {sender, message, date, messageId,
+                                              originalMessageId, originalMessage, originalSender, replied}]};
       });
     });
 
     socketRef.current.on('receiveEditedMessage', (messageData) => {
       setMessages(prevMessages => {
-        const {course, message, sender, date, messageId} = messageData;
+        const {course, message, sender, date, messageId, replied, editStatus} = messageData;
         return {...prevMessages, [course]: prevMessages[course].map((m) => {
             if (m.messageId === messageId)
-              return {...m, message: message};
+              return {...m, message: message, editStatus: editStatus};
             else
               return m;
           }),
@@ -128,10 +129,10 @@ export default function Messages() {
 
   return (
     <div>
-      <h1 className="text-3xl mb-5">Messages</h1>
-      <div className="space-y-8">
+      <h1 className="text-3xl m-5">Messages</h1>
+      <div className="space-y-8 border-2 rounded-md w-fit m-5">
       <DropdownMenu>
-        <DropdownMenuTrigger>{'Course Group Chats'}</DropdownMenuTrigger>
+        <DropdownMenuTrigger><p className="m-2">{'Select a Course Group Chat'}</p></DropdownMenuTrigger>
         <DropdownMenuContent>
           {enrolledCourses.map((course, idx) => (
             <div key={idx}>
@@ -157,7 +158,10 @@ export default function Messages() {
                   <div key={idx}>
                     <MessageComponent key={message.messageId} messageId={message.messageId}
                         message={message.message} date={message.date} sender={message.sender} currentUser={email}
-                        initialReactions={message.reactions} course={currentCourse}/>
+                        initialReactions={message.reactions} course={currentCourse} replied={message.replied}
+                        originalMessage={message.originalMessage} originalSender={message.originalSender}
+                        socket={socketRef.current} editStatus={message.editStatus}
+                        originalMessageId = {message.originalMessageId}/>
                     </div>
                   )
                 })}
@@ -177,3 +181,4 @@ export default function Messages() {
     </div>
   );
 }
+
