@@ -148,7 +148,6 @@ const PostPage = ({ params }) => {
     }
   };
 
-
   const handleDeleteComment = async (commentId) => {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
@@ -212,9 +211,11 @@ const PostPage = ({ params }) => {
 
       <div className="space-y-4">
         {Object.keys(comments).length === 0 && <p>No comments yet. Be the first to comment!</p>}
-        {Object.entries(comments).map(([commentId, comment]) => (
+        {Object.entries(comments).sort(([idA, commentA], [idB, commentB]) => new Date(commentB.time) - new Date(commentA.time)).
+        map(([commentId, comment, email]) => (
           <Card key={commentId} className="p-4">
             <p>{comment.text}</p>
+            <p className="text-sm text-gray-500">comment at: {new Date(comment.time).toLocaleString()}</p>
             <div className="flex items-center space-x-2 mt-2">
               <Button variant="secondary" size="small" onClick={() => handleUpvoteComment(commentId)}>Upvote</Button>
               <span>{comment.upvotes || 0}</span>
