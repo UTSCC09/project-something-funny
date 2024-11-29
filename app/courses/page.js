@@ -5,7 +5,9 @@ import { useEffect } from 'react';
 
 export default function Home() {
   useEffect(() => {
-    const courses = ["CSCC09", "CSCC10", "CSCC11", "CSCC37", "CSCC73", "CSCD01"];
+    const courses = ["CSCC01", "CSCC09", "CSCC10", "CSCC11", "CSCC24", "CSCC37", "CSCC43", "CSCC63", 
+      "CSCC69", "CSCC73", "CSCC85", "CSCD01", "CSCD03", "CSCD18", "CSCD27", "CSCD37", "CSCD43", "CSCD58",
+      "CSCD84"];
     const addCoursesToDb = async () => {
       try {
         const response = await fetch('/api/getCourses');
