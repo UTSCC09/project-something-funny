@@ -22,10 +22,30 @@ export default function Messages() {
   const [currentChat, setCurrentChat] = useState(null);
   const [chatEmail, setChatEmail] = useState('');
   const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(0);
   const chatBoxRef = useRef(null);
   const socketRef = useRef(null);
   
+  // scroll up to get more messages
+  useEffect(() => {
+    const chatBox = chatBoxRef.current;
+    if (!chatBox) 
+      return;
+    const handleScroll = () => {
+      const scrollTop = chatBox.scrollTop;
+      const maxScrollTop = chatBox.scrollHeight - chatBox.clientHeight;
+      if (!loading && (scrollTop) + maxScrollTop <= 1 &&  (scrollTop) + maxScrollTop >= -1) {
+        chatToUser(null, null, currentChat);
+      }
+    };
+    chatBox.addEventListener("scroll", handleScroll);
+    return () => {
+      chatBox.removeEventListener("scroll", handleScroll);
+    };
+  }, [loading, messages]);
+
+
   useEffect(() => {
     socketRef.current = io('http://localhost:5000'); 
     async function getAllUsers() {
@@ -50,10 +70,16 @@ export default function Messages() {
     });
   }, [email]);
 
-  const chatToUser = async (userEmail, userId) => {
-    const chatId = userId < uid ? userId+uid : uid+userId;
-    setCurrentChat(chatId);
-    setChatEmail(userEmail);
+  const chatToUser = async (userEmail, userId, currentChat) => {
+    let chatId = currentChat;
+    if (currentChat == null) {
+      chatId = userId < uid ? userId+uid : uid+userId;
+      setCurrentChat(chatId);
+      setChatEmail(userEmail);
+    }
+    if (loading) 
+      return;
+    setLoading(true);
     setIndex(0);
     socketRef.current.emit('joinChat', currentChat);
     const response = await fetch(`/api/getPrivateMessages?chatId=${chatId}&index=${index}`);
@@ -61,6 +87,7 @@ export default function Messages() {
       const data = await response.json();
       setIndex(index+1);
       setMessages((pastMessages) => ({...pastMessages, [chatId]: data.messages}));
+      setLoading(false);
     }
   };
 
@@ -86,7 +113,7 @@ export default function Messages() {
         {allUsers.map((user, idx) => (
             <div key={idx}>
             <DropdownMenuLabel>
-              <Button key={idx} onClick={() => chatToUser(user.email, user.userId)}> {user.email} </Button>
+              <Button key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             </div>

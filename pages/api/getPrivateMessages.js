@@ -23,7 +23,7 @@ if (!chatId || !index)
       const start = length - 10*(index+1) >= 0 ? length - 10*(index+1) : 0;
       const end = length - 10*(index) < length ? length - 10*(index) : length;
       const slicedMessages = parsedMessages.slice(start, end);
-      res.status(200).json({success: true, messages: slicedMessages});
+      return res.status(200).json({success: true, messages: slicedMessages});
     });  
   } 
   catch (error) {
