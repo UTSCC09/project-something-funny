@@ -7,9 +7,8 @@
     try {
       let max_possible_index = 0;
       const messages = await redis.hgetall(`courses:${course}:messages`);
-      redis.hlen(`courses:${course}:messages`).then((length) => {
+      const length = await redis.hlen(`courses:${course}:messages`);
         max_possible_index = Math.floor(length / 10);
-
         if (index > max_possible_index)
           return res.status(400).json({ success: false, message: "No more messages to load" });
 
@@ -24,7 +23,7 @@
         const end = length - 10*(index) < length ? length - 10*(index) : length;
         const slicedMessages = parsedMessages.slice(start, end);
         res.status(200).json({success: true, messages: slicedMessages});
-      });  
+      
     } 
     catch (error) {
       return res.status(500).json({ success: false, message: "Internal server error" });

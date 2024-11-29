@@ -74,20 +74,26 @@ export default function Messages() {
   useEffect(() => {
     if (allUsers.length > 0) {
       async function checkIfChatStarted() {
+        const newChat = [];
+        const existingUsers = [];
         for (let i = 0; i < allUsers.length; i++) {
             const response = await fetch(`/api/getExistingChatUsers?uid=${uid}&userId=${allUsers[i].userId}`);
             if (response.ok) {
               const data = await response.json();
-              console.log(data);
               if (data.chatExists)
-                setChatUsers((x) => [...x,{userId: allUsers[i].userId, email: allUsers[i].email}]);
+                existingUsers.push({userId: allUsers[i].userId, email: allUsers[i].email});
               else
-                setNewUsers((x) => [...x, {userId: allUsers[i].userId, email: allUsers[i].email}]);
-          }}}
+                newChat.push({userId: allUsers[i].userId, email: allUsers[i].email});
+          }}
+          setChatUsers(existingUsers);
+          setNewUsers(newChat);
+        }
+
       checkIfChatStarted(); 
     }}, [allUsers, uid]); 
 
   const chatToUser = async (userEmail, userId, currentChat) => {
+    setIndex(0);
     let chatId = currentChat;
     if (currentChat == null) {
       chatId = userId < uid ? userId+uid : uid+userId;
@@ -97,12 +103,11 @@ export default function Messages() {
     if (loading) 
       return;
     setLoading(true);
-    setIndex(0);
     socketRef.current.emit('joinChat', currentChat);
     const response = await fetch(`/api/getPrivateMessages?chatId=${chatId}&index=${index}`);
     if (response.ok) {
       const data = await response.json();
-      setIndex(index+1);
+      setIndex(i=>i+1);
       setMessages((pastMessages) => ({...pastMessages, [chatId]: [...data.messages, ...(pastMessages[chatId] || [])]}));
       setLoading(false);
     }
@@ -124,14 +129,9 @@ export default function Messages() {
       <h1 className="text-3xl m-5">Profile:</h1>
       <p className="m-5">Email: {email}</p>
       <h1 className="text-3xl m-5">Private Messages:</h1>
-      <div className="flex flex-col">
-      <p className="ml-5">{'Select an Existing Chat'}</p>
-      {chatUsers.map((user, idx) => (
-          <Button key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
-      ))}
-      </div>
+
       <DropdownMenu>
-        <DropdownMenuTrigger><p className="ml-5">{'Select a User'}</p></DropdownMenuTrigger>
+        <DropdownMenuTrigger><p className="ml-5">{'Start a New Chat'}</p></DropdownMenuTrigger>
         <DropdownMenuContent>
         {newUsers.map((user, idx) => (
             <div key={idx}>
@@ -144,29 +144,31 @@ export default function Messages() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div >
-        {currentChat && (
-          <div>
-            <h2 className="m-5">Chat with: {chatEmail}</h2>
-            <div className="space-y-4">
-              <div className={styles.chat_container} ref={chatBoxRef}>
-                <div> 
-                {(messages[currentChat] || []).map((message, idx) => {            
-                  return (
-                  <div key={idx}>
-                    <ChatComponent key={message.messageId} messageId={message.messageId}
+      <div className="flex w-full">
+        <div className="flex flex-col">
+          <p className="m-5">{'Select an Existing Chat'}</p>
+          {chatUsers.map((user, idx) => (
+            <Button className="ml-5 mb-1" key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
+          ))}
+        </div>
+
+        <div className="flex-1">
+          {currentChat && (
+            <div>
+              <h2 className="m-5">Chat with: {chatEmail}</h2>
+              <div className="space-y-4">
+                <div className={styles.chat_container} ref={chatBoxRef}>
+                  {(messages[currentChat] || []).map((message, idx) => {            
+                    return (
+                    <div key={idx}>
+                      <ChatComponent key={message.messageId} messageId={message.messageId}
                         message={message.message} date={message.date} sender={message.sender} currentUser={email}
-                        initialReactions={message.reactions} chatId={currentChat} 
-                        socket={socketRef.current}/>
-                    </div>
-                  )
-                })}
-                </div>
+                        initialReactions={message.reactions} chatId={currentChat} socket={socketRef.current}/>
+                    </div>)
+                  })}
               </div>
               <div className="message-input">
-                <Textarea 
-                  type="text" value={newMessage} 
-                  onChange={(change) => setNewMessage(change.target.value)} 
+                <Textarea type="text" value={newMessage} onChange={(change) => setNewMessage(change.target.value)} 
                   placeholder="Enter in a message" />
                 <Button onClick={sendMessage}>Send</Button>
               </div>
@@ -174,6 +176,7 @@ export default function Messages() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }
