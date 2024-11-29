@@ -211,8 +211,8 @@ const PostPage = ({ params }) => {
 
       <div className="space-y-4">
         {Object.keys(comments).length === 0 && <p>No comments yet. Be the first to comment!</p>}
-        {Object.entries(comments).sort(([idA, commentA], [idB, commentB]) => new Date(commentB.time) - new Date(commentA.time)).
-        map(([commentId, comment, email]) => (
+        {Object.entries(comments).sort(([idA, commentA], [idB, commentB]) => new Date(commentB.time) - new Date(commentA.time))
+        .map(([commentId, comment]) => (
           <Card key={commentId} className="p-4">
             <p>{comment.text}</p>
             <p className="text-sm text-gray-500">comment at: {new Date(comment.time).toLocaleString()}</p>
