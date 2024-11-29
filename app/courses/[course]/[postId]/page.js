@@ -19,6 +19,7 @@ const PostPage = ({ params }) => {
   const [error, setError] = useState(null);
   const user = useAuthStore((state) => state.user);
   const uid = user.uid;
+  const email=user.email;
 
   // Fetch post data
   useEffect(() => {
@@ -67,25 +68,36 @@ const PostPage = ({ params }) => {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+  
+    // Validate the comment text
     if (!commentText.trim()) {
       setError("Comment cannot be empty.");
       return;
     }
-
+  
+    // Ensure email is available
+    if (!email) {
+      setError("Email is required.");
+      return;
+    }
+  
     try {
       const response = await fetch(`/api/addComment?course=${course}&postId=${postId}&uid=${uid}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: commentText }),
+        body: JSON.stringify({
+          text: commentText,
+          email: email,  
+        }),
       });
-
+  
+      // Parse the response
       const data = await response.json();
       if (data.success) {
-        setCommentText('');
-
-        const refreshedPostResponse = await fetch(`/api/getPostById?course=${course}&postId=${postId}`);
+        setCommentText('');  
+          const refreshedPostResponse = await fetch(`/api/getPostById?course=${course}&postId=${postId}`);
         const refreshedData = await refreshedPostResponse.json();
         if (refreshedData.success) {
           setPost(refreshedData.post);
@@ -214,8 +226,9 @@ const PostPage = ({ params }) => {
         {Object.entries(comments).sort(([idA, commentA], [idB, commentB]) => new Date(commentB.time) - new Date(commentA.time))
         .map(([commentId, comment]) => (
           <Card key={commentId} className="p-4">
+            <p className="text-sm text-gray-500">commented by {comment.email}</p>
             <p>{comment.text}</p>
-            <p className="text-sm text-gray-500">comment at: {new Date(comment.time).toLocaleString()}</p>
+            <p className="text-sm text-gray-500">commented at: {new Date(comment.time).toLocaleString()}</p>
             <div className="flex items-center space-x-2 mt-2">
               <Button variant="secondary" size="small" onClick={() => handleUpvoteComment(commentId)}>Upvote</Button>
               <span>{comment.upvotes || 0}</span>
