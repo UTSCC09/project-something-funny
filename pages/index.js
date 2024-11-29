@@ -5,6 +5,8 @@ import { TextEditor } from './components/text-editor';
 import 'react-quill/dist/quill.snow.css'; 
 
 export default function Home() {
+    //Var to store the course name for display purposes
+    const courseName = "sample-doc";
 
 //This use effect is just us signing in so we can edit the firebase. If we're integrating with
 //Firebase all that needs to change is to use the earlier sign in data. 
