@@ -4,29 +4,33 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import useAuthStore from '../hooks/useAuthStore'
 import {useState} from "react";
+
 export default function Home() {
   const user = useAuthStore((state) => state.user);
   const [loggedIn, setLoggedIn] = useState(true);
   const router = useRouter();
+
   const pushToCourses = () => {
     if (user !== null)
       router.push(`/courses`);
     else 
       setLoggedIn(false);
   };
+
   const pushToMessaging = () => {
     if (user !== null)
       router.push(`/messages`); 
     else
       setLoggedIn(false);
   };
+
   return (
     <div style={mainContainerStyle}>
       <Navbar />
-      <section>
-        <button onClick={pushToCourses}>Courses</button>
-        <button onClick={pushToMessaging}>Messaging</button>
-        {!loggedIn &&<p>Please log in.</p>}
+      <section style={buttonSectionStyle}>
+        <button style={buttonStyle} onClick={pushToCourses}>Courses</button>
+        <button style={buttonStyle} onClick={pushToMessaging}>Messaging</button>
+        {!loggedIn &&<p style={loginMessageStyle}>Please log in.</p>}
       </section>
       <main style={mainContentStyle}>
         <h1 style={welcomeStyle}>Welcome to the University of Toronto Grand Library</h1>
@@ -121,4 +125,32 @@ const featuresListStyle = {
 const startMessageStyle = {
   fontSize: '1.2rem',
   color: '#555',
+};
+
+const buttonSectionStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '2rem',
+  marginBottom: '2rem',
+};
+
+const buttonStyle = {
+  backgroundColor: '#00567d',
+  color: '#fff',
+  border: 'none',
+  padding: '10px 20px',
+  fontSize: '1rem',
+  cursor: 'pointer',
+  borderRadius: '5px',
+  transition: 'background-color 0.3s',
+};
+
+const buttonStyleHover = {
+  backgroundColor: '#003c57',
+};
+
+const loginMessageStyle = {
+  fontSize: '1rem',
+  color: '#d9534f',
+  marginTop: '1rem',
 };
