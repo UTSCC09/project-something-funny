@@ -19,28 +19,25 @@ export default async function deletePost(req, res) {
     if (!postJSON) {
       return res.status(404).json({ success: false, message: "Post not found." });
     }
+
     const post = JSON.parse(postJSON);
-    
-    // Check if the user is authorized to delete the post
+
     if (post.uid !== uid) {
       return res.status(403).json({ success: false, message: "Invalid user: cannot delete" });
     }
 
-    // Delete the post from Redis
     const deleted = await redis.hdel(`courses:${course}:posts`, postId);
     if (deleted === 0) {
       return res.status(404).json({ success: false, message: "Post not found." });
     }
-
-    // Delete associated comments from Redis
     await redis.del(`courses:${course}:posts:${postId}:comments`);
 
-    // Check if there's a file associated with the post, and delete it
-    if (post.fileName) {
-      const filePath = path.join(process.cwd(), 'public', 'uploads', post.fileName);
+    if (post.fileUrl) {
+      const filePath = path.join(process.cwd(), 'public', post.fileUrl); 
+
       if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath); // Synchronously delete the file
-        console.log(`File ${post.fileName} deleted successfully.`);
+        fs.unlinkSync(filePath); 
+        console.log(`File ${filePath} deleted successfully.`);
       } else {
         console.warn(`File not found: ${filePath}`);
       }
