@@ -33,6 +33,33 @@ io.on('connection', (socket) => {
     console.log(`A new user has joined the chat for ${course}`);
   });
 
+  socket.on('joinChat', (chatId) => {
+    socket.join(chatId);
+  });
+
+  // private messaging
+  socket.on('sendPrivateMessage', async ({chatId, message, sender}) => {
+    if (!chatId || !message || !sender)
+      return socket.emit('status', {status: 400, message: 'Must include all fields'});
+    const messageId = uuidv4(); 
+    const date = new Date().toISOString();
+    const dbData = {messageId, message, sender, date};;
+    const db = `privateMessages:${chatId}:messages`;
+    await redis.hset(db, messageId, JSON.stringify(dbData));
+    io.emit('receivePrivateMessage', {chatId, ...dbData});
+  });
+
+  socket.on('reactedToPrivateMessage', async (data) => {
+    const {chatId, messageId, emoji} = data;
+    if (!chatId || !messageId || !emoji) 
+      return socket.emit('status', {status: 400, message: 'Must include all fields'});
+    const db = `privateMessages:${chatId}:messages:${messageId}:reactions`;
+    await redis.hincrby(db, emoji, 1);
+    const reactions = await redis.hgetall(`privateMessages:${chatId}:messages:${messageId}:reactions`);
+    io.emit('updatedPrivateReactions', {messageId, chatId, reactions});
+  });
+
+  // group messaging 
   socket.on('sendMessage', async ({course, message, sender}) => {
     if (!course || !message || !sender)
       return socket.emit('status', {status: 400, message: 'Must include all fields'});

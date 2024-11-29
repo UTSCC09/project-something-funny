@@ -1,0 +1,130 @@
+'use client';
+import { useState, useEffect, useRef } from "react";
+import { Button } from '@/components/ui/button';
+import styles from "styles/messages.module.css"
+import io from 'socket.io-client';
+import { Textarea } from '@/components/ui/textarea'; 
+import {DropdownMenu, DropdownMenuTrigger, DropdownMenuLabel, 
+  DropdownMenuSeparator, DropdownMenuContent } from '../../components/ui/dropdown-menu'
+import useAuthStore from '../../hooks/useAuthStore'
+import { useRouter } from 'next/navigation';
+import Navbar from '@/components/Navbar';
+import ChatComponent from "./components/ChatComponent.js"
+
+export default function Messages() {
+  const router = useRouter();
+  const [allUsers, setAllUsers] = useState([]);
+  const user = useAuthStore((state) => state.user);
+  const email = user.email;
+  const uid = user.uid;
+
+  const [messages, setMessages] = useState({});
+  const [currentChat, setCurrentChat] = useState(null);
+  const [chatEmail, setChatEmail] = useState('');
+  const [newMessage, setNewMessage] = useState('');
+  const [index, setIndex] = useState(0);
+  const chatBoxRef = useRef(null);
+  const socketRef = useRef(null);
+  
+  useEffect(() => {
+    socketRef.current = io('http://localhost:5000'); 
+    async function getAllUsers() {
+      try {
+        const response = await fetch(`/api/getAllUsers`);
+        if (response.ok) {
+          const data = await response.json();
+          setAllUsers(data.users);
+        }
+      } 
+      catch (err) {
+          console.error(err);
+      } 
+    };
+    getAllUsers();
+
+    socketRef.current.on('receivePrivateMessage', (messageData) => {
+      setMessages((prevMessages) => {
+        const {chatId, message, sender, date, messageId} = messageData;
+        return {...prevMessages, [chatId]: [...(prevMessages[chatId] || []), {sender, message, date, messageId}]};
+      });
+    });
+  }, [email]);
+
+  const chatToUser = async (userEmail, userId) => {
+    const chatId = userId < uid ? userId+uid : uid+userId;
+    setCurrentChat(chatId);
+    setChatEmail(userEmail);
+    setIndex(0);
+    socketRef.current.emit('joinChat', currentChat);
+    const response = await fetch(`/api/getPrivateMessages?chatId=${chatId}&index=${index}`);
+    if (response.ok) {
+      const data = await response.json();
+      setIndex(index+1);
+      setMessages((pastMessages) => ({...pastMessages, [chatId]: data.messages}));
+    }
+  };
+
+  const sendMessage = () => {
+    if (newMessage) {
+        socketRef.current.emit('sendPrivateMessage', {chatId: currentChat, message: newMessage, sender: email});
+        setNewMessage('');
+      }
+    };
+
+  return (
+    <div>
+      <Button variant="outline" onClick={() => router.push('/')} className="mb-4">
+        Main Menu
+      </Button>
+      <Navbar/>
+      <h1 className="text-3xl m-5">Profile:</h1>
+      <p className="m-5">Email: {email}</p>
+      <h1 className="text-3xl m-5">Private Messages:</h1>
+      <DropdownMenu>
+        <DropdownMenuTrigger><p className="ml-5">{'Select a User'}</p></DropdownMenuTrigger>
+        <DropdownMenuContent>
+        {allUsers.map((user, idx) => (
+            <div key={idx}>
+            <DropdownMenuLabel>
+              <Button key={idx} onClick={() => chatToUser(user.email, user.userId)}> {user.email} </Button>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            </div>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <div >
+        {currentChat && (
+          <div>
+            <h2 className="m-5">Chat with: {chatEmail}</h2>
+            <div className="space-y-4">
+              <div className={styles.chat_container} ref={chatBoxRef}>
+                <div> 
+                {(messages[currentChat] || []).map((message, idx) => {            
+                  return (
+                  <div key={idx}>
+                    <ChatComponent key={message.messageId} messageId={message.messageId}
+                        message={message.message} date={message.date} sender={message.sender} currentUser={email}
+                        initialReactions={message.reactions} chatId={currentChat} 
+                        socket={socketRef.current}/>
+                    </div>
+                  )
+                })}
+                </div>
+              </div>
+              <div className="message-input">
+                <Textarea 
+                  type="text" value={newMessage} 
+                  onChange={(change) => setNewMessage(change.target.value)} 
+                  placeholder="Enter in a message" />
+                <Button onClick={sendMessage}>Send</Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
