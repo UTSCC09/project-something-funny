@@ -86,7 +86,7 @@ export default function Messages() {
     if (response.ok) {
       const data = await response.json();
       setIndex(index+1);
-      setMessages((pastMessages) => ({...pastMessages, [chatId]: data.messages}));
+      setMessages((pastMessages) => ({...pastMessages, [chatId]: [...data.messages, ...(pastMessages[chatId] || [])]}));
       setLoading(false);
     }
   };
