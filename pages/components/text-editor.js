@@ -6,12 +6,16 @@ import {db} from '../firebase-config';
 import {throttle} from "lodash";
 
 export const TextEditor = () => {
+
+    //Just pass the name of the document to this variable here
+    const docname = "sample-doc";
+
     const quillRef = useRef(null);
     const [isEditing, setIsEditing] = useState(false);
 
     const isLocalChange = useRef(false);
 
-    const documentRef = doc(db, "documents", "sample-doc");
+    const documentRef = doc(db, "documents", docname);
 
     const saveContent = throttle(() => {
         if (quillRef.current && isLocalChange.current){

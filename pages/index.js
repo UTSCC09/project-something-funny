@@ -6,6 +6,8 @@ import 'react-quill/dist/quill.snow.css';
 
 export default function Home() {
 
+//This use effect is just us signing in so we can edit the firebase. If we're integrating with
+//Firebase all that needs to change is to use the earlier sign in data. 
   useEffect(() => {
     signInAnonymously(auth);
     onAuthStateChanged(auth, user => {

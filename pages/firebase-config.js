@@ -1,3 +1,6 @@
+/*This is my firebase config file, just change it later so that it uses the proper firebase
+ *config later
+ */
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
