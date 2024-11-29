@@ -14,6 +14,8 @@ import ChatComponent from "./components/ChatComponent.js"
 export default function Messages() {
   const router = useRouter();
   const [allUsers, setAllUsers] = useState([]);
+  const [chatUsers, setChatUsers] = useState([]);
+  const [newUsers, setNewUsers] = useState([]);
   const user = useAuthStore((state) => state.user);
   const email = user.email;
   const uid = user.uid;
@@ -45,7 +47,6 @@ export default function Messages() {
     };
   }, [loading, messages]);
 
-
   useEffect(() => {
     socketRef.current = io('http://localhost:5000'); 
     async function getAllUsers() {
@@ -69,6 +70,22 @@ export default function Messages() {
       });
     });
   }, [email]);
+
+  useEffect(() => {
+    if (allUsers.length > 0) {
+      async function checkIfChatStarted() {
+        for (let i = 0; i < allUsers.length; i++) {
+            const response = await fetch(`/api/getExistingChatUsers?uid=${uid}&userId=${allUsers[i].userId}`);
+            if (response.ok) {
+              const data = await response.json();
+              console.log(data);
+              if (data.chatExists)
+                setChatUsers((x) => [...x,{userId: allUsers[i].userId, email: allUsers[i].email}]);
+              else
+                setNewUsers((x) => [...x, {userId: allUsers[i].userId, email: allUsers[i].email}]);
+          }}}
+      checkIfChatStarted(); 
+    }}, [allUsers, uid]); 
 
   const chatToUser = async (userEmail, userId, currentChat) => {
     let chatId = currentChat;
@@ -107,10 +124,16 @@ export default function Messages() {
       <h1 className="text-3xl m-5">Profile:</h1>
       <p className="m-5">Email: {email}</p>
       <h1 className="text-3xl m-5">Private Messages:</h1>
+      <div className="flex flex-col">
+      <p className="ml-5">{'Select an Existing Chat'}</p>
+      {chatUsers.map((user, idx) => (
+          <Button key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
+      ))}
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger><p className="ml-5">{'Select a User'}</p></DropdownMenuTrigger>
         <DropdownMenuContent>
-        {allUsers.map((user, idx) => (
+        {newUsers.map((user, idx) => (
             <div key={idx}>
             <DropdownMenuLabel>
               <Button key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
