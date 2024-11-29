@@ -47,8 +47,8 @@ const Navbar = () => {
               <DropdownMenuSeparator />
               {user ? (
                 <>
-                  <DropdownMenuItem onClick={() => router.push('/ profile')}>
-                    Profile
+                  <DropdownMenuItem onClick={() => router.push('/')}>
+                    Home
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     Logout
