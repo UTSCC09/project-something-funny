@@ -2,13 +2,23 @@
 import Navbar from "../components/Navbar";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
+import useAuthStore from '../hooks/useAuthStore'
+import {useState} from "react";
 export default function Home() {
+  const user = useAuthStore((state) => state.user);
+  const [loggedIn, setLoggedIn] = useState(true);
   const router = useRouter();
   const pushToCourses = () => {
-    router.push(`/courses`); 
+    if (user !== null)
+      router.push(`/courses`);
+    else 
+      setLoggedIn(false);
   };
   const pushToMessaging = () => {
-    router.push(`/messages`); 
+    if (user !== null)
+      router.push(`/messages`); 
+    else
+      setLoggedIn(false);
   };
   return (
     <div style={mainContainerStyle}>
@@ -16,6 +26,7 @@ export default function Home() {
       <section>
         <button onClick={pushToCourses}>Courses</button>
         <button onClick={pushToMessaging}>Messaging</button>
+        {!loggedIn &&<p>Please log in.</p>}
       </section>
       <main style={mainContentStyle}>
         <h1 style={welcomeStyle}>Welcome to the University of Toronto Grand Library</h1>

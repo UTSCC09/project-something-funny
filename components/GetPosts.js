@@ -4,12 +4,15 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button'; 
 import { Card } from '@/components/ui/card'; 
 import { ThumbsUp,ThumbsDown } from 'lucide-react';
+import useAuthStore from '../hooks/useAuthStore';
 const imageExtensions = ['jpg', 'jpeg', 'png'];
 const videoExtensions = ['mp4'];
 
 const GetPosts = ({ course, submitted, setSubmitted }) => {
   const [posts, setPosts] = useState({});
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const uid = user.uid;
   
   const displayFile = (fileUrl, mimetype) => {
     if (!fileUrl || !mimetype) return null;
@@ -78,17 +81,17 @@ const GetPosts = ({ course, submitted, setSubmitted }) => {
 
   const deletePost = async (postId) => {
     try {
-      const response = await fetch(`/api/deletePost?course=${course}&postId=${postId}`, {
+      const response = await fetch(`/api/deletePost?course=${course}&postId=${postId}&uid=${uid}`, {
         method: 'DELETE',
       });
       const data = await response.json();
       if (data.success) {
         fetchPosts(); 
       } else {
-        console.error(data.message);
+        console.log(data.message);
       }
     } catch (error) {
-      console.error("Error deleting post:", error);
+      console.log("Error deleting post:", error);
     }
   };
 

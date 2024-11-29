@@ -8,14 +8,20 @@ export default async function deletePost(req, res) {
     return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` });
   }
 
-  const { course, postId } = req.query;
+  const { course, postId, uid } = req.query;
 
-  if (!course || !postId) {
-    return res.status(400).json({ success: false, message: "Course and postId are required." });
+  if (!course || !postId || !uid) {
+    return res.status(400).json({ success: false, message: "Course, postId, and uid are required." });
   }
 
   try {
-
+    const postJSON = await redis.hget(`courses:${course}:posts`, postId);
+    if (!postJSON) {
+      return res.status(404).json({ success: false, message: "Post not found." });
+    }
+    const post = JSON.parse(postJSON);
+    if (post.uid !== uid)
+      return res.status(403).json({ success: false, message: "Invalid user: cannot delete" });
     const deleted = await redis.hdel(`courses:${course}:posts`, postId);
     if (deleted === 0) {
       return res.status(404).json({ success: false, message: "Post not found." });

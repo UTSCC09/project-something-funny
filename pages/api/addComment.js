@@ -8,11 +8,11 @@ export default async function addComment(req, res) {
     return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` });
   }
 
-  const { course, postId } = req.query;
+  const { course, postId, uid } = req.query;
   const { text } = req.body;
 
-  if (!course || !postId) {
-    return res.status(400).json({ success: false, message: "Course and postId are required." });
+  if (!course || !postId || !uid) {
+    return res.status(400).json({ success: false, message: "Course, postId, and uid are required." });
   }
 
   if (!text || !text.trim()) {
@@ -24,6 +24,7 @@ export default async function addComment(req, res) {
     const time = new Date().toISOString();
     const comment = {
       time,
+      uid,
       text: text.trim(),
       upvotes: 0,
       downvotes: 0,

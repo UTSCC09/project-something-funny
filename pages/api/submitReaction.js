@@ -1,7 +1,6 @@
 import redis from '../../lib/redisClient';
 
 export default async function submitReaction(req, res) {
-  console.log(req.body);
   if (req.method === "POST") {
     const {course, messageId, emoji} = req.body;
 

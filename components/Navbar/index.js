@@ -18,7 +18,6 @@ const Navbar = () => {
   const user = useAuthStore((state) => state.user);
   const signOutUser = useAuthStore((state) => state.signOutUser);
   const router = useRouter();
-  console.log(user);
 
   const handleLogout = async () => {
     try {

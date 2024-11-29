@@ -34,6 +34,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async ({course, message, sender}) => {
+    if (!course || !message || !sender)
+      return socket.emit('status', {status: 400, message: 'Must include all fields'});
     const messageId = uuidv4(); 
     const date = new Date().toISOString();
     const dbData = {messageId, message, sender, date};;
@@ -43,6 +45,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('replyMessage', async ({course, message, sender, originalMessage, originalSender, originalMessageId}) => {
+    if (!course || !message || !sender || !originalMessage || !originalSender || !originalMessageId)
+      return socket.emit('status', {status: 400, message: 'Must include all fields'});
+    if (message.trim() === "")
+      return socket.emit('status', {status: 400, message: 'Message cannot be blank'});
     const messageId = uuidv4(); 
     const date = new Date().toISOString();
     const replied = true;
@@ -53,6 +59,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('editMessage', async ({course, message, sender, messageId, date}) => {
+    if (!course || !message || !sender || !messageId || !date)
+      return socket.emit('status', {status: 400, message: 'Must include all fields'});
     const editStatus = true;
     const dbData = {messageId, message, sender, date, editStatus};
     const db = `courses:${course}:messages`;
@@ -63,7 +71,7 @@ io.on('connection', (socket) => {
   socket.on('reactedToMessage', async (data) => {
     const {course, messageId, emoji} = data;
     if (!course || !messageId || !emoji) 
-      return;
+      return socket.emit('status', {status: 400, message: 'Must include all fields'});
     const db = `courses:${course}:messages:${messageId}:reactions`;
     await redis.hincrby(db, emoji, 1);
     const reactions = await redis.hgetall(`courses:${course}:messages:${messageId}:reactions`);

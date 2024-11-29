@@ -2,17 +2,19 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button'; 
-import Cookie from 'js-cookie';
+import useAuthStore from '../hooks/useAuthStore'
 export default function GetCourses() {
   const router = useRouter();
   const [coursesList, setCoursesList] = useState([]);
   const [enrolledCourses, setenrolledCourses] = useState([]);
-  const email = Cookie.get('userEmail');
+
+  const user = useAuthStore((state) => state.user);
+  const uid = user.uid;
 
   useEffect(() => {
     async function getEnrolledCourses() {
       try {
-        const response = await fetch(`/api/getEnrolledCourses?email=${email}`, {
+        const response = await fetch(`/api/getEnrolledCourses?uid=${uid}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -29,7 +31,7 @@ export default function GetCourses() {
       }
     }
     getEnrolledCourses();
-  }, [email]);
+  }, [uid]);
 
   useEffect(() => {
     async function fetchCourses() {
@@ -49,17 +51,18 @@ export default function GetCourses() {
   }, []);
 
   const clickCourse = (course) => {
-    router.push(`/courses/${course}`); 
+    if (enrolledCourses.indexOf(course) !== -1)
+      router.push(`/courses/${course}`); 
   };
 
-  const unenroll = async ({email, course}) => {
+  const unenroll = async ({uid, course}) => {
     try {
       const response = await fetch('/api/unenrollFromCourse', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({email, course}),
+        body: JSON.stringify({uid, course}),
       });
       if (response.ok)
         setenrolledCourses((allCourses) => allCourses.filter((c) => c !== course));
@@ -69,14 +72,14 @@ export default function GetCourses() {
     }
   };
 
-  const enroll = async ({email, course}) => {
+  const enroll = async ({uid, course}) => {
     try {
       const response = await fetch('/api/enrollInCourse', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({email, course}),
+        body: JSON.stringify({uid, course}),
       });
       const data = await response.json();
       if (response.ok)
@@ -99,7 +102,7 @@ export default function GetCourses() {
               <Button variant="primary" onClick={() => clickCourse(course)}>
                 {course}
               </Button>
-              <Button onClick={() => unenroll({email, course})}>Unenroll</Button>
+              <Button onClick={() => unenroll({uid, course})}>Unenroll</Button>
             </div>
           ))}
         </div>
@@ -112,7 +115,7 @@ export default function GetCourses() {
               <Button variant="secondary" onClick={() => clickCourse(course)}>
                 {course}
               </Button>
-              <Button onClick={() => enroll({email, course})}>Enroll</Button>
+              <Button onClick={() => enroll({uid, course})}>Enroll</Button>
             </div>
           ))}
         </div>

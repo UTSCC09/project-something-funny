@@ -2,8 +2,11 @@
 import GetCourses from '@/components/GetCourses';
 import Navbar from '@/components/Navbar';
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button'; 
 
 export default function Home() {
+  const router = useRouter();
   useEffect(() => {
     const courses = ["CSCC01", "CSCC09", "CSCC10", "CSCC11", "CSCC24", "CSCC37", "CSCC43", "CSCC63", 
       "CSCC69", "CSCC73", "CSCC85", "CSCD01", "CSCD03", "CSCD18", "CSCD27", "CSCD37", "CSCD43", "CSCD58",
@@ -31,6 +34,9 @@ export default function Home() {
 
   return (
     <div className="">
+      <Button variant="outline" onClick={() => router.push('/')} className="mb-4">
+        Main Menu
+      </Button>
       <Navbar/>
       <div className="p-5">
         <h1 className="text-4xl font-bold text-center mb-4">Courses</h1>

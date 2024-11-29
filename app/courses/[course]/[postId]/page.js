@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card'; 
 import { Textarea } from '@/components/ui/textarea'; 
 import React from 'react';
+import useAuthStore from '../../../../hooks/useAuthStore';
 const imageExtensions = ['jpg', 'jpeg', 'png'];
 const videoExtensions = ['mp4'];
 
@@ -16,6 +17,8 @@ const PostPage = ({ params }) => {
   const [comments, setComments] = useState({});
   const [commentText, setCommentText] = useState('');
   const [error, setError] = useState(null);
+  const user = useAuthStore((state) => state.user);
+  const uid = user.uid;
 
   // Fetch post data
   useEffect(() => {
@@ -70,7 +73,7 @@ const PostPage = ({ params }) => {
     }
 
     try {
-      const response = await fetch(`/api/addComment?course=${course}&postId=${postId}`, {
+      const response = await fetch(`/api/addComment?course=${course}&postId=${postId}&uid=${uid}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +153,7 @@ const PostPage = ({ params }) => {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
     try {
-      const response = await fetch(`/api/deleteComment?course=${course}&postId=${postId}&commentId=${commentId}`, {
+      const response = await fetch(`/api/deleteComment?course=${course}&postId=${postId}&commentId=${commentId}&uid=${uid}`, {
         method: 'DELETE',
       });
       const data = await response.json();

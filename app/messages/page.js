@@ -1,13 +1,15 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
-import Cookie from 'js-cookie';
 import { Button } from '@/components/ui/button';
 import io from 'socket.io-client';
 import styles from "styles/messages.module.css"
 import MessageComponent from "./components/MessageComponent.js"
-import {DropdownMenu, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuItem, 
+import {DropdownMenu, DropdownMenuTrigger, DropdownMenuLabel, 
   DropdownMenuSeparator, DropdownMenuContent } from '../../components/ui/dropdown-menu'
 import { Textarea } from '@/components/ui/textarea'; 
+import useAuthStore from '../../hooks/useAuthStore'
+import { useRouter } from 'next/navigation';
+import Navbar from '@/components/Navbar';
 
 export default function Messages() {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -16,15 +18,19 @@ export default function Messages() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false); 
   const [index, setIndex] = useState(0);
-  const email = Cookie.get('userEmail');
   const chatBoxRef = useRef(null);
   const socketRef = useRef(null);
+  const router = useRouter();
+  
+  const user = useAuthStore((state) => state.user);
+  const email = user.email;
+  const uid = user.uid;
   
   useEffect(() => {
     socketRef.current = io('http://localhost:5000'); 
     async function getEnrolledCourses() {
       try {
-        const response = await fetch(`/api/getEnrolledCourses?email=${email}`, {
+        const response = await fetch(`/api/getEnrolledCourses?uid=${uid}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -129,6 +135,10 @@ export default function Messages() {
 
   return (
     <div>
+      <Button variant="outline" onClick={() => router.push('/')} className="mb-4">
+        Main Menu
+      </Button>
+      <Navbar/>
       <h1 className="text-3xl m-5">Messages</h1>
       <div className="space-y-8 border-2 rounded-md w-fit m-5">
       <DropdownMenu>

@@ -1,5 +1,3 @@
-
-
 import redis from '../../lib/redisClient';
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +12,7 @@ const submitPost = async (req, res) => {
       return res.status(400).json({ success: false, message: "File upload error." });
     }
     try {
-      const { text } = req.body;
+      const { text, uid } = req.body;
       const course = req.query.course;
       let fileUrl = null;
       const uniqueId = uuidv4(); 
@@ -27,6 +25,9 @@ const submitPost = async (req, res) => {
       if (!text) {
         return res.status(400).json({ success: false, message: "Text is required." });
       }
+      if (!uid) {
+        return res.status(400).json({ success: false, message: "Uid is required." });
+      }
 
       if (req.file) {
         fileUrl = `/uploads/${req.file.filename}`;
@@ -34,13 +35,13 @@ const submitPost = async (req, res) => {
         await redis.hset(
           `courses:${course}:posts`,
           uniqueId,
-          JSON.stringify({ time, text, fileUrl, mimetype, upvotes: 0, downvotes: 0 })
+          JSON.stringify({ time, text, fileUrl, mimetype, uid, upvotes: 0, downvotes: 0 })
         );
       } else {
         await redis.hset(
           `courses:${course}:posts`,
           uniqueId,
-          JSON.stringify({ time, text, upvotes: 0, downvotes: 0 })
+          JSON.stringify({ time, text, uid, upvotes: 0, downvotes: 0 })
         );
       }
 
@@ -51,6 +52,7 @@ const submitPost = async (req, res) => {
           postId: uniqueId,
           time,
           text,
+          uid,
           fileUrl,
           mimetype: req.file ? req.file.mimetype : null,
           upvotes: 0,

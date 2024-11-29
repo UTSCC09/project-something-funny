@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card'; 
 import { Textarea } from '@/components/ui/textarea'; 
 import { Input } from '@/components/ui/input'; 
+import useAuthStore from '../../../hooks/useAuthStore';
 
 const CoursePage = ({ params }) => {
   const router = useRouter();
@@ -13,6 +14,8 @@ const CoursePage = ({ params }) => {
   const [text, setText] = useState('');
   const [file, setFile] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const uid = user.uid;
 
   const addFile = (e) => {
     setFile(e.target.files[0]);
@@ -26,6 +29,7 @@ const CoursePage = ({ params }) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append('text', text);
+    formData.append('uid', uid);
     if (file) formData.append('file', file);
 
     try {
