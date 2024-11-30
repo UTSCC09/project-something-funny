@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
     const dbData = {messageId, message, sender, date};;
     const db = `privateMessages:${chatId}:messages`;
     await redis.hset(db, messageId, JSON.stringify(dbData));
-    io.emit('receivePrivateMessage', {chatId, ...dbData});
+    socket.emit('receivePrivateMessage', {chatId, ...dbData});
   });
 
   socket.on('reactedToPrivateMessage', async (data) => {
