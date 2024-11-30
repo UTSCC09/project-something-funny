@@ -1,14 +1,14 @@
+
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-
+import { getFirestore } from "firebase/firestore";
 const firebaseConfig = {
-  apiKey: "AIzaSyC2AqlHoxZv1PMAQ9Z4gKcCuJUcjVUGAqg",
-  authDomain: "utsclibrary-6ee82.firebaseapp.com",
-  projectId: "utsclibrary-6ee82",
-  storageBucket: "utsclibrary-6ee82.firebasestorage.app",
-  messagingSenderId: "94684778391",
-  appId: "1:94684778391:web:94aca197ea2d68e7317ed2",
-  measurementId: "G-YH96T4JNKB"
+  apiKey: "AIzaSyCaUv37KllYy40ULWnh8RtfaseBE6AZtFs",
+  authDomain: "toronto-grand-library.firebaseapp.com",
+  projectId: "toronto-grand-library",
+  storageBucket: "toronto-grand-library.firebasestorage.app",
+  messagingSenderId: "756263348997",
+  appId: "1:756263348997:web:c413a03350604bfc12656c"
 };
 
 let firebaseApp;
@@ -20,5 +20,5 @@ if (!getApps().length) {
 }
 
 const auth = getAuth(firebaseApp);
-
+export const db = getFirestore(firebaseApp);
 export { auth };
