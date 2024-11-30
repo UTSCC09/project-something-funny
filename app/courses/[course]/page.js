@@ -16,6 +16,10 @@ const CoursePage = ({ params }) => {
   const [submitted, setSubmitted] = useState(false);
   const user = useAuthStore((state) => state.user);
   const uid = user.uid;
+  
+  const pushToDocuments = () => {
+    router.push('/doc');
+  }
 
   const addFile = (e) => {
     setFile(e.target.files[0]);
@@ -57,6 +61,7 @@ const CoursePage = ({ params }) => {
         Main Menu
       </Button>
       <h1 className="text-3xl font-semibold mb-2">{course}</h1>
+      <Button onClick={()=>pushToDocuments()}>Documents</Button>
       <h2 className="text-2xl mb-4">Create a Post</h2>
       <Card className="mb-6">
         <form onSubmit={handleSubmit} className="p-4">

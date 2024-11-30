@@ -1,7 +1,7 @@
 
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-
+import { getFirestore } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: "AIzaSyCaUv37KllYy40ULWnh8RtfaseBE6AZtFs",
   authDomain: "toronto-grand-library.firebaseapp.com",
@@ -20,5 +20,5 @@ if (!getApps().length) {
 }
 
 const auth = getAuth(firebaseApp);
-
+export const db = getFirestore(firebaseApp);
 export { auth };

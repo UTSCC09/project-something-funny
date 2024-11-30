@@ -7,7 +7,7 @@ if (!chatId || !index)
   try {
     let max_possible_index = 0;
     const messages = await redis.hgetall(`privateMessages:${chatId}:messages`);
-    redis.hlen(`privateMessages:${chatId}:messages`).then((length) => {
+    const length = redis.hlen(`privateMessages:${chatId}:messages`);
       max_possible_index = Math.floor(length / 10);
 
       if (index > max_possible_index)
@@ -24,7 +24,7 @@ if (!chatId || !index)
       const end = length - 10*(index) < length ? length - 10*(index) : length;
       const slicedMessages = parsedMessages.slice(start, end);
       return res.status(200).json({success: true, messages: slicedMessages});
-    });  
+
   } 
   catch (error) {
     return res.status(500).json({ success: false, message: "Internal server error" });
