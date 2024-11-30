@@ -1,0 +1,13 @@
+  document                         [m cc52d2c [ahead 2] git commit -m 'update'
+  main                             [m 3e66817 [behind 5] Add project URL
+* [32mmessaging                        [m 9d77d19 [behind 1] git commit -m 'working docs'
+  [31mremotes/origin/Chang             [m 2ceed4a change text
+  [31mremotes/origin/HEAD              [m -> origin/main
+  [31mremotes/origin/Swetha            [m e611a8e display pdfs
+  [31mremotes/origin/changnew1         [m 4f81772 1
+  [31mremotes/origin/changtestandchange[m 1053649 1
+  [31mremotes/origin/document          [m 3e66817 Add project URL
+  [31mremotes/origin/finalmerge        [m c0af51e fix merge
+  [31mremotes/origin/main              [m bb6f79f git commit -m 'updated variables'
+  [31mremotes/origin/merge             [m 5a4e1ab remove duplicated files
+  [31mremotes/origin/messaging         [m c0f48de more bug fixes and minor changes

@@ -1,12 +1,15 @@
 import dynamic from 'next/dynamic';
-// import ReactQuill from "react-quill";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false })
+import ReactQuill from "react-quill-new";
 import {useRef, useEffect, useState, useMemo} from "react";
 import { setDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
-import {db} from '../../../firebase-auth/index.js';
+import {firebaseDB} from '../../../firebase-auth/index.js';
+import useAuthStore from '../../../hooks/useAuthStore.js';
 import {throttle} from "lodash";
 
 export const TextEditor = () => {
+
+    const user = useAuthStore((state) => state.user);
+    const uid = user.uid;
 
     //Just pass the name of the document to this variable here
     const docname = "sample-doc";
@@ -16,7 +19,7 @@ export const TextEditor = () => {
 
     const isLocalChange = useRef(false);
 
-    const documentRef = doc(db, "documents", docname);
+    const documentRef = doc(firebaseDB, "documents", docname);
 
     const saveContent = throttle(() => {
         if (quillRef.current && isLocalChange.current){
@@ -87,3 +90,5 @@ export const TextEditor = () => {
     </div>
     );
 };
+
+export default TextEditor;
