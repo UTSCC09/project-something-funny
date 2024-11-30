@@ -1,9 +1,15 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { Button } from '@/components/ui/button';
 
 export default function DisplayPDF({ fileUrl }) {
+  const [pdfDocument, setPdfDocument] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageRendering, setPageRendering] = useState(false);
+  const [pendingPage, setPendingPage] = useState(null);
+  const [loadingTask, setLoadingTask] = useState(null);
+  const scale = 1.5;
   const canvasRef = useRef(null);
   const prevButtonRef = useRef(null);
   const nextButtonRef = useRef(null);
@@ -11,106 +17,112 @@ export default function DisplayPDF({ fileUrl }) {
   const totalPagesRef = useRef(null);
 
   useEffect(() => {
-
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
-
-    let pdfDocument = null;
-    let pageNumber = 1;
-    const scale = 1.5;
-    let pendingPage = null;
-    let pageRendering = false;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-
-    const renderPage = (num) => {
-      pageRendering = true;
-      pdfDocument.getPage(num).then((page) => {
-        const viewport = page.getViewport({ scale: scale });
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-
-        const renderContext = {
-          canvasContext: ctx,
-          viewport: viewport,
-        };
-        const renderTask = page.render(renderContext);
-        renderTask.promise.then(() => {
-          pageRendering = false;
-          if (pendingPage !== null) {
-            renderPage(pendingPage);
-            pendingPage = null;
-          }
-        });
-      });
-
-      if (pageNumberRef.current) {
-        pageNumberRef.current.textContent = num;
-      }
-    };
-
-    const checkRenderPage = (num) => {
-      if (pageRendering) {
-        pendingPage = num;
-      } else {
-        renderPage(num);
-      }
-    };
-
-    const PreviousPage = () => {
-      if (pageNumber > 1) {
-        pageNumber--;
-        checkRenderPage(pageNumber);
-      }
-    };
-
-    const NextPage = () => {
-      if (pdfDocument && pageNumber < pdfDocument.numPages) {
-        pageNumber++;
-        checkRenderPage(pageNumber);
-      }
-    };
-
     const loadPDF = async () => {
       try {
-        const loadingTask = pdfjsLib.getDocument(fileUrl);
-        pdfDocument = await loadingTask.promise;
-        if (totalPagesRef.current) {
-          totalPagesRef.current.textContent = pdfDocument.numPages;
-        }
+        if (loadingTask)
+          loadingTask.cancel(); 
+        const newLoadingTask = pdfjsLib.getDocument({url:fileUrl});
+        setLoadingTask(newLoadingTask); 
+
+        const newPdfDocument = await newLoadingTask.promise;
+        if (pdfDocument)
+          pdfDocument.destroy();
+        setPdfDocument(newPdfDocument);
+        if (totalPagesRef.current)
+          totalPagesRef.current.textContent = newPdfDocument.numPages;
         renderPage(pageNumber);
-      } catch (error) {
-        console.error('Error loading PDF:', error);
+      }
+      catch (error) {
+        console.log(error);
       }
     };
 
     loadPDF();
-
-
-    const prevButton = prevButtonRef.current;
-    const nextButton = nextButtonRef.current;
-
-    prevButton.addEventListener('click', PreviousPage);
-    nextButton.addEventListener('click', NextPage);
-
-
     return () => {
-      prevButton.removeEventListener('click', PreviousPage);
-      nextButton.removeEventListener('click', NextPage);
-      if (pdfDocument) {
+      if (pdfDocument) 
         pdfDocument.destroy();
-      }
+      if (loadingTask)
+        loadingTask.cancel();
     };
   }, [fileUrl]);
+
+
+  useEffect(() => {
+    if (pdfDocument && pageNumber === 1) {
+      renderPage(pageNumber);
+    }
+  }, [pdfDocument, pageNumber]);
+  
+  const renderPage = (num) => {
+    if (!pdfDocument || pageRendering) 
+      return;
+    setPageRendering(true);
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    pdfDocument.getPage(num).then((page) => {
+      const viewport = page.getViewport({ scale });
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      const renderContext = {
+        canvasContext: ctx,
+        viewport: viewport,
+      };
+
+      const renderTask = page.render(renderContext);
+      renderTask.promise.then(() => {
+        setPageRendering(false); 
+        if (pendingPage !== null) {
+          renderPage(pendingPage); 
+          setPendingPage(null);
+        }
+      }).catch(() => {
+        setPageRendering(false);
+      });
+    });
+
+    if (pageNumberRef.current)
+      pageNumberRef.current.textContent = num;
+  };
+
+  const checkRenderPage = (num) => {
+    if (pageRendering)
+      setPendingPage(num);
+    else
+      renderPage(num);
+  };
+
+  const PreviousPage = () => {
+    if (pageNumber > 1) {
+      setPageNumber((p) => {
+        const newPage = p - 1;
+        checkRenderPage(newPage);
+        return newPage;
+      });
+    }
+  };
+
+  const NextPage = () => {
+    if (pdfDocument && pageNumber < pdfDocument.numPages) {
+      setPageNumber((p) => {
+        const newPage = p + 1;
+        checkRenderPage(newPage);
+        return newPage;
+      });
+    }
+  };
 
   return (
     <div className="w-full">
       <canvas ref={canvasRef} className="w-full h-auto border rounded"></canvas>
       <div className="flex items-center space-x-2 mt-2">
-        <Button ref={prevButtonRef} variant="secondary">
+        <Button ref={prevButtonRef} variant="secondary" onClick={PreviousPage}>
           Previous
         </Button>
-        <Button ref={nextButtonRef} variant="secondary">
+        <Button ref={nextButtonRef} variant="secondary" onClick={NextPage} >
           Next
         </Button>
         <p className="ml-4">

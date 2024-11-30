@@ -24,7 +24,7 @@ export default function Messages() {
   
   const user = useAuthStore((state) => state.user);
   const email = user.email;
-  const uid = user.uid;
+  const uid = user ? user.uid : null;
   
   useEffect(() => {
     socketRef.current = io('http://localhost:5000'); 
