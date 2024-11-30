@@ -19,7 +19,7 @@ const PostPage = ({ params }) => {
   const [error, setError] = useState(null);
   const user = useAuthStore((state) => state.user);
   const uid = user ? user.uid : null;
-  const email=user.email;
+  const email = user ? user.email : null;
 
   // Fetch post data
   useEffect(() => {

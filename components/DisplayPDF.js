@@ -9,12 +9,13 @@ export default function DisplayPDF({ fileUrl }) {
   const [pageRendering, setPageRendering] = useState(false);
   const [pendingPage, setPendingPage] = useState(null);
   const [loadingTask, setLoadingTask] = useState(null);
-  const scale = 1.5;
+  const [scale, setScale] = useState(1.25);
   const canvasRef = useRef(null);
   const prevButtonRef = useRef(null);
   const nextButtonRef = useRef(null);
   const pageNumberRef = useRef(null);
   const totalPagesRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
@@ -52,7 +53,7 @@ export default function DisplayPDF({ fileUrl }) {
     if (pdfDocument && pageNumber === 1) {
       renderPage(pageNumber);
     }
-  }, [pdfDocument, pageNumber]);
+  }, [pdfDocument, pageNumber, scale]);
   
   const renderPage = (num) => {
     if (!pdfDocument || pageRendering) 
@@ -64,8 +65,11 @@ export default function DisplayPDF({ fileUrl }) {
 
     pdfDocument.getPage(num).then((page) => {
       const viewport = page.getViewport({ scale });
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
+      const ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
+      canvas.width = viewport.width * ratio
+      canvas.height = viewport.height * ratio
+      ctx.scale(ratio, ratio);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const renderContext = {
         canvasContext: ctx,
@@ -115,10 +119,20 @@ export default function DisplayPDF({ fileUrl }) {
     }
   };
 
+  const zoomIn = () => {
+    setScale((s) => Math.min(s * 1.1, 5)); 
+  };
+
+  const zoomOut = () => {
+    setScale((s) => Math.max(s / 1.1, 0.5)); 
+  };
+
   return (
-    <div className="w-full">
+    <div className="overflow-auto" ref={containerRef}>
       <canvas ref={canvasRef} className="w-full h-auto border rounded"></canvas>
       <div className="flex items-center space-x-2 mt-2">
+        <Button variant="secondary" onClick={zoomIn}> Zoom In </Button>
+        <Button variant="secondary" onClick={zoomOut}> Zoom Out </Button>
         <Button ref={prevButtonRef} variant="secondary" onClick={PreviousPage}>
           Previous
         </Button>

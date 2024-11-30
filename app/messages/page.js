@@ -23,7 +23,7 @@ export default function Messages() {
   const router = useRouter();
   
   const user = useAuthStore((state) => state.user);
-  const email = user.email;
+  const email = user ? user.email : null;
   const uid = user ? user.uid : null;
   
   useEffect(() => {

@@ -17,7 +17,7 @@ export default function Messages() {
   const [chatUsers, setChatUsers] = useState([]);
   const [newUsers, setNewUsers] = useState([]);
   const user = useAuthStore((state) => state.user);
-  const email = user.email;
+  const email = user ? user.email : null;
   const uid = user ? user.uid : null;
 
   const [messages, setMessages] = useState({});
