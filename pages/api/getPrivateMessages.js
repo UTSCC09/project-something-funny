@@ -7,7 +7,8 @@ if (!chatId || !index)
   try {
     let max_possible_index = 0;
     const messages = await redis.hgetall(`privateMessages:${chatId}:messages`);
-    const length = redis.hlen(`privateMessages:${chatId}:messages`);
+    const length = await redis.hlen(`privateMessages:${chatId}:messages`);
+
       max_possible_index = Math.floor(length / 10);
 
       if (index > max_possible_index)

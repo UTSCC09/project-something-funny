@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import useAuthStore from '../hooks/useAuthStore'
+import { Button } from '@/components/ui/button';
 import {useState} from "react";
 export default function Home() {
   const user = useAuthStore((state) => state.user);
@@ -24,8 +25,8 @@ export default function Home() {
     <div style={mainContainerStyle}>
       <Navbar />
       <section>
-        <button onClick={pushToCourses}>Courses</button>
-        <button onClick={pushToMessaging}>Messaging</button>
+        <Button className="m-2" onClick={pushToCourses}>Courses</Button>
+        <Button className="m-2" onClick={pushToMessaging}>Messaging</Button>
         {!loggedIn &&<p>Please log in.</p>}
       </section>
       <main style={mainContentStyle}>

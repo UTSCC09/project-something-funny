@@ -38,7 +38,7 @@ export default function Messages() {
       const scrollTop = chatBox.scrollTop;
       const maxScrollTop = chatBox.scrollHeight - chatBox.clientHeight;
       if (!loading && (scrollTop) + maxScrollTop <= 1 &&  (scrollTop) + maxScrollTop >= -1) {
-        chatToUser(null, null, currentChat);
+        loadMessages(currentChat);
       }
     };
     chatBox.addEventListener("scroll", handleScroll);
@@ -91,9 +91,28 @@ export default function Messages() {
 
       checkIfChatStarted(); 
     }}, [allUsers, uid]); 
+  
+  const loadMessages = async (currentChat) => {
+    if (loading) 
+      return;
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/getPrivateMessages?chatId=${currentChat}&index=${index}`);
+      if (response.ok) {
+        const data = await response.json();
+        setIndex(index+1);
+        setMessages((pastMessages) => ({...pastMessages, [currentChat]: [...data.messages, ...(pastMessages[currentChat] || [])]}));
+      }
+    } 
+    catch (err) {
+        console.error(err);
+    } 
+    finally {
+      setLoading(false);
+    }
+  };
 
   const chatToUser = async (userEmail, userId, currentChat) => {
-    setIndex(0);
     let chatId = currentChat;
     if (currentChat == null) {
       chatId = userId < uid ? userId+uid : uid+userId;
@@ -104,11 +123,12 @@ export default function Messages() {
       return;
     setLoading(true);
     socketRef.current.emit('joinChat', currentChat);
-    const response = await fetch(`/api/getPrivateMessages?chatId=${chatId}&index=${index}`);
+
+    const response = await fetch(`/api/getPrivateMessages?chatId=${chatId}&index=0`);
     if (response.ok) {
       const data = await response.json();
-      setIndex(i=>i+1);
-      setMessages((pastMessages) => ({...pastMessages, [chatId]: [...data.messages, ...(pastMessages[chatId] || [])]}));
+      setIndex(1);
+      setMessages((pastMessages) => ({...pastMessages, [chatId]: data.messages}));
       setLoading(false);
     }
   };
@@ -119,7 +139,6 @@ export default function Messages() {
         setNewMessage('');
       }
     };
-
   return (
     <div>
       <Button variant="outline" onClick={() => router.push('/')} className="mb-4">
@@ -131,7 +150,7 @@ export default function Messages() {
       <h1 className="text-3xl m-5">Private Messages:</h1>
 
       <DropdownMenu>
-        <DropdownMenuTrigger><p className="ml-5">{'Start a New Chat'}</p></DropdownMenuTrigger>
+        <DropdownMenuTrigger><p className="ml-5 border-2 rounded-sm">{'Start a New Chat'}</p></DropdownMenuTrigger>
         <DropdownMenuContent>
         {newUsers.map((user, idx) => (
             <div key={idx}>
@@ -158,6 +177,7 @@ export default function Messages() {
               <h2 className="m-5">Chat with: {chatEmail}</h2>
               <div className="space-y-4">
                 <div className={styles.chat_container} ref={chatBoxRef}>
+                  <div>
                   {(messages[currentChat] || []).map((message, idx) => {            
                     return (
                     <div key={idx}>
@@ -166,6 +186,7 @@ export default function Messages() {
                         initialReactions={message.reactions} chatId={currentChat} socket={socketRef.current}/>
                     </div>)
                   })}
+              </div>
               </div>
               <div className="message-input">
                 <Textarea type="text" value={newMessage} onChange={(change) => setNewMessage(change.target.value)} 

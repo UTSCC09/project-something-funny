@@ -23,7 +23,7 @@ export default async function submitPrivateReaction(req, res) {
   
     try {
       const reactions = await redis.hgetall(`privateMessages:${chatId}:messages:${messageId}:reactions`);
-      return res.status(200).json({success: true, reactions});
+      return res.status(200).json({success: true, reactions: reactions});
     } 
     catch (error) {
       res.status(500).json({success: false, message: error});

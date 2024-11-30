@@ -77,12 +77,11 @@ export default function Messages() {
 
   const joinCourse = async (course) => {
     setCurrentCourse(course);
-    setIndex(0);
     socketRef.current.emit('joinCourse', course);
-    const response = await fetch(`/api/getMessages?course=${course}&index=${index}`);
+    const response = await fetch(`/api/getMessages?course=${course}&index=0`);
     if (response.ok) {
       const data = await response.json();
-      setIndex(index+1);
+      setIndex(1);
       setMessages((pastMessages) => ({...pastMessages, [course]: data.messages}));
     }
   };
