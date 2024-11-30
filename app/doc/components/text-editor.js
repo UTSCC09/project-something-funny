@@ -1,4 +1,3 @@
-import dynamic from 'next/dynamic';
 import ReactQuill from 'react-quill-new';
 import {useRef, useEffect, useState, useMemo} from "react";
 import { setDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
