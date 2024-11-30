@@ -2,15 +2,17 @@
 import { auth } from "../../firebase-auth/index";
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { useEffect } from 'react';
-import { TextEditor } from './components/text-editor';
 import 'react-quill/dist/quill.snow.css'; 
+import { lazy } from "react"
+
+const TextEditor = lazy(() => import('./components/text-editor'));
 
 export default function Home() {
-    //Var to store the course name for display purposes
-    const courseName = "sample-doc";
-
-//This use effect is just us signing in so we can edit the firebase. If we're integrating with
-//Firebase all that needs to change is to use the earlier sign in data. 
+  const [loadComponent, setLoadComponent] = useState(false);
+  //Var to store the course name for display purposes
+  const courseName = "sample-doc";
+  //This use effect is just us signing in so we can edit the firebase. If we're integrating with
+  //Firebase all that needs to change is to use the earlier sign in data. 
   useEffect(() => {
     signInAnonymously(auth);
     onAuthStateChanged(auth, user => {
@@ -20,6 +22,10 @@ export default function Home() {
     })
   }, []);
 
+  const handleButtonClick = () => {
+    setLoadComponent(true);
+  }
+
   return (
     <div className="App">
       <header>
@@ -28,7 +34,14 @@ export default function Home() {
         <link href="./styles/App.css" rel="stylesheet" key="test"/>
       </header>
       {}
-      <TextEditor />
+      <button id="load document" onClick={handleButtonClick}>
+        Do you want to view document?
+      </button>
+      {loadComponent && 
+      (<Suspense fallback={<div>Loading...</div>}>
+        <TextEditor />
+      </Suspense>)
+      }
     </div>
   );
 }
