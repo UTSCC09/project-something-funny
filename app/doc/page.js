@@ -1,8 +1,6 @@
 'use client'
 import { auth } from "../../firebase-auth/index";
-/* import { signInAnonymously, onAuthStateChanged } from 'firebase/auth'; */
 import { useEffect, useState, Suspense} from 'react';
-/* import useAuthStore from '../hooks/useAuthStore' */
 import 'react-quill/dist/quill.snow.css'; 
 import { lazy } from "react"
 import { useRouter } from 'next/navigation';
@@ -22,9 +20,7 @@ export default function Home() {
   //Firebase all that needs to change is to use the earlier sign in data. 
 
   const user = useAuthStore((state) => state.user);
-  const uid = user.uid;
-
-  console.log(user.uid);
+  const uid = user ? user.uid : null
 
   useEffect(() => {
     //const user = useAuthStore((state) => state.user);

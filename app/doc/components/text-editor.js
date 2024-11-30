@@ -8,9 +8,9 @@ import {throttle} from "lodash";
 
 export const TextEditor = () => {
 
-    const user = useAuthStore((state) => state.user);
+    /* const user = useAuthStore((state) => state.user);
     const uid = user.uid;
-
+ */
     //Just pass the name of the document to this variable here
     const docname = "sample-doc";
 
