@@ -9,7 +9,7 @@ export default function GetCourses() {
   const [enrolledCourses, setenrolledCourses] = useState([]);
 
   const user = useAuthStore((state) => state.user);
-  const uid = user.uid;
+  const uid = user ? user.uid : null;
 
   useEffect(() => {
     async function getEnrolledCourses() {

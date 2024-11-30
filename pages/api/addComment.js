@@ -1,4 +1,3 @@
-
 import redis from '../../lib/redisClient';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,7 +8,7 @@ export default async function addComment(req, res) {
   }
 
   const { course, postId, uid } = req.query;
-  const { text } = req.body;
+  const { text, email } = req.body; 
 
   if (!course || !postId || !uid) {
     return res.status(400).json({ success: false, message: "Course, postId, and uid are required." });
@@ -19,13 +18,18 @@ export default async function addComment(req, res) {
     return res.status(400).json({ success: false, message: "Comment text is required." });
   }
 
+  if (!email || !email.trim()) { 
+    return res.status(400).json({ success: false, message: "Email is required." });
+  }
+
   try {
-    const commentId = uuidv4(); 
+    const commentId = uuidv4();
     const time = new Date().toISOString();
     const comment = {
       time,
       uid,
       text: text.trim(),
+      email: email.trim(),  // Store the email in the comment object
       upvotes: 0,
       downvotes: 0,
     };
