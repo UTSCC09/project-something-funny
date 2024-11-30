@@ -1,7 +1,7 @@
 'use client'
 import { auth } from "../../firebase-auth/index";
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import 'react-quill/dist/quill.snow.css'; 
 import { lazy, Suspense } from "react"
 import {useRouter} from "next/navigation";
@@ -10,15 +10,18 @@ const TextEditor = lazy(() => import('./components/text-editor'));
 
 export default function Home() {
   const [loadComponent, setLoadComponent] = useState(false);
-
-  const user = useAuthStore((state) => state.user);
-  const uid = user ? user.uid : null
-
   //Var to store the course name for display purposes
   const courseName = "sample-doc";
+  const router = useRouter();
   //This use effect is just us signing in so we can edit the firebase. If we're integrating with
   //Firebase all that needs to change is to use the earlier sign in data. 
   useEffect(() => {
+    signInAnonymously(auth);
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        console.log('User signed in: ', user.uid);
+      }
+    })
   }, []);
 
   const handleButtonClick = () => {
