@@ -11,4 +11,6 @@ import redis from '../../lib/redisClient';
       return res.status(500).json({message: 'Could not add courses'});
     }
   }
+  else
+    return res.status(405).json({ success: false, message: `Method ${req.method} Not Allowed` });
   }

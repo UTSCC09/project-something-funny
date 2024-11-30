@@ -12,7 +12,7 @@ const GetPosts = ({ course, submitted, setSubmitted }) => {
   const [posts, setPosts] = useState({});
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const uid = user.uid;
+  const uid = user ? user.uid : null;
   
   const displayFile = (fileUrl, mimetype) => {
     if (!fileUrl || !mimetype) return null;

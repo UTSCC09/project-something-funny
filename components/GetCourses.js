@@ -38,8 +38,10 @@ export default function GetCourses() {
       try {
         const response = await fetch('/api/getCourses');
         const data = await response.json();
-        if (response.ok) 
+        if (response.ok) {
+          data.courses.sort();
           setCoursesList(data.courses); 
+        }
         else
           setCoursesList([]);
       } catch (error) {

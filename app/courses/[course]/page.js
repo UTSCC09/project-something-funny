@@ -15,7 +15,7 @@ const CoursePage = ({ params }) => {
   const [file, setFile] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const user = useAuthStore((state) => state.user);
-  const uid = user.uid;
+  const uid = user ? user.uid : null;
   
   const pushToDocuments = () => {
     router.push('/doc');

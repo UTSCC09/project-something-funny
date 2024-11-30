@@ -1,11 +1,10 @@
 'use client'
 import { auth } from "../../firebase-auth/index";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useRouter } from 'next/navigation';
-import useAuthStore from '../../hooks/useAuthStore.js';
-import { useEffect, useState, Suspense} from 'react';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { useEffect } from 'react';
 import 'react-quill/dist/quill.snow.css'; 
-import { lazy } from "react"
+import { lazy, Suspense } from "react"
+import {useRouter} from "next/navigation";
 
 const TextEditor = lazy(() => import('./components/text-editor'));
 
@@ -17,7 +16,6 @@ export default function Home() {
 
   //Var to store the course name for display purposes
   const courseName = "sample-doc";
-
   //This use effect is just us signing in so we can edit the firebase. If we're integrating with
   //Firebase all that needs to change is to use the earlier sign in data. 
   useEffect(() => {
@@ -30,7 +28,7 @@ export default function Home() {
   return (
     <div className="App">
       <header>
-        <button id="back">Go Back</button>
+        <button id="back" onClick={() => router.push('/')}>Go Back</button>
         <h1 id="CurrentCourse"> Google Docs Clone </h1>
         <link href="./styles/App.css" rel="stylesheet" key="test"/>
       </header>

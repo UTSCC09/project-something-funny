@@ -18,8 +18,8 @@ const PostPage = ({ params }) => {
   const [commentText, setCommentText] = useState('');
   const [error, setError] = useState(null);
   const user = useAuthStore((state) => state.user);
-  const uid = user.uid;
-  const email=user.email;
+  const uid = user ? user.uid : null;
+  const email = user ? user.email : null;
 
   // Fetch post data
   useEffect(() => {
@@ -193,15 +193,6 @@ const PostPage = ({ params }) => {
         <div className="p-4">
           <p className="mb-4">{post.text}</p>
           {displayFile(post.fileUrl, post.mimetype)} 
-          {post.mimetype === "application/pdf" && (
-            <div id="pdf_buttons" className="flex items-center space-x-2 mt-4">
-              <Button id="prev" variant="secondary">Previous</Button>
-              <Button id="next" variant="secondary">Next</Button>
-              <p>
-                Page: <span id="page_number">1</span> / <span id="total_pages">0</span>
-              </p>
-            </div>
-          )}
         </div>
       </Card>
       
