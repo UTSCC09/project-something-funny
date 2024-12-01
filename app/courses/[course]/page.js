@@ -18,8 +18,9 @@ const CoursePage = ({ params }) => {
   const uid = user ? user.uid : null;
   
   const pushToDocuments = () => {
-    router.push(`/doc/?course=${course}`);
-  }
+    localStorage.setItem('variable', course);
+    router.push(`/doc`);
+  };
 
   const addFile = (e) => {
     setFile(e.target.files[0]);
