@@ -20,9 +20,11 @@ export default function Messages() {
   const email = user ? user.email : null;
   const uid = user ? user.uid : null;
 
+  const [notifications, setNotifications] = useState([]);
   const [messages, setMessages] = useState({});
   const [currentChat, setCurrentChat] = useState(null);
   const [chatEmail, setChatEmail] = useState('');
+  const [chatUserId, setChatUserId] = useState('');
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(0);
@@ -63,12 +65,23 @@ export default function Messages() {
     };
     getAllUsers();
 
+    socketRef.current.on('new_notification', (data) => {
+        const {sender, count} = data;
+        setNotifications((prev) => {
+          const senderData = prev[sender] || { count: 0 };
+        return {...prev, [sender]: {count: count}};
+      });
+    });
+
     socketRef.current.on('receivePrivateMessage', (messageData) => {
       setMessages((prevMessages) => {
         const {chatId, message, sender, date, messageId} = messageData;
         return {...prevMessages, [chatId]: [...(prevMessages[chatId] || []), {sender, message, date, messageId}]};
       });
     });
+    return () => {
+      socketRef.current.disconnect();
+    };
   }, [email]);
 
   useEffect(() => {
@@ -118,11 +131,12 @@ export default function Messages() {
       chatId = userId < uid ? userId+uid : uid+userId;
       setCurrentChat(chatId);
       setChatEmail(userEmail);
+      setChatUserId(userId);
     }
     if (loading) 
       return;
     setLoading(true);
-    socketRef.current.emit('joinChat', currentChat);
+    socketRef.current.emit('joinChat', currentChat, uid);
 
     const response = await fetch(`/api/getPrivateMessages?chatId=${chatId}&index=0`);
     if (response.ok) {
@@ -135,16 +149,45 @@ export default function Messages() {
 
   const sendMessage = () => {
     if (newMessage) {
-        socketRef.current.emit('sendPrivateMessage', {chatId: currentChat, message: newMessage, sender: email});
+        socketRef.current.emit('sendPrivateMessage', {chatId: currentChat, message: newMessage, sender: email, sendTo: chatUserId});
         setNewMessage('');
       }
     };
+
+    const handleNotificationClick = async (sender) => {
+      document.getElementById("notification_id").style.display = "none";
+      setNotifications((prev) => {
+        const update = {...prev};
+        delete update[sender];
+        return update;
+      });
+      const response = await fetch('/api/deleteNotification', {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({sender: sender, sendTo: uid}), 
+      });
+    };
+
   return (
     <div>
       <Button variant="outline" onClick={() => router.push('/')} className="mb-4">
         Main Menu
       </Button>
       <Navbar/>
+      <div className="m-5">
+      {Object.keys(notifications).length > 0 && (
+        Object.entries(notifications).map(([sender, data], index) => (
+          <div key={index}>
+            <div id="notification_id">
+              <p>ALERT: {sender} sent {data.count} messages</p>
+            </div>
+            <Button onClick={() => handleNotificationClick(sender)}>Dismiss</Button>
+          </div>
+        ))
+      )}
+    </div>
+
+        
       <h1 className="text-3xl m-5">Profile:</h1>
       <p className="m-5">Email: {email}</p>
       <h1 className="text-3xl m-5">Private Messages:</h1>

@@ -158,7 +158,7 @@ export default function Messages() {
         
         {currentCourse && (
           <div>
-            <h2 className="mt-5">{currentCourse} Groupchat</h2>
+            <h2 className="m-5">{currentCourse} Groupchat</h2>
             <div className="space-y-4">
               <div className={styles.chat_container} ref={chatBoxRef}>
                 <div> 

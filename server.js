@@ -7,6 +7,14 @@ const app = express();
 const server = http.createServer(app);
 const {v4: uuidv4} = require('uuid');
 
+const allSockets = {};
+
+// external ip address
+const external_ip = 'http://34.0.41.88';
+function getSocketOfSendTo(userId) {
+  return allSockets[userId];
+}
+
 const redis = new Redis({
   host: 'localhost', 
   port: 6379, 
@@ -14,13 +22,13 @@ const redis = new Redis({
 
 const io = socketIo(server, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: ['http://localhost:3000', external_ip],
       methods: ['GET', 'POST'], 
     }
   });
 
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: ['http://localhost:3000', external_ip], 
     allowedHeaders: ['Content-Type'],
     methods: ['GET', 'POST'],
   }));
@@ -33,12 +41,13 @@ io.on('connection', (socket) => {
     console.log(`A new user has joined the chat for ${course}`);
   });
 
-  socket.on('joinChat', (chatId) => {
+  socket.on('joinChat', (chatId, uid) => {
+    allSockets[uid] = socket.id;
     socket.join(chatId);
   });
 
   // private messaging
-  socket.on('sendPrivateMessage', async ({chatId, message, sender}) => {
+  socket.on('sendPrivateMessage', async ({chatId, message, sender, sendTo}) => {
     if (!chatId || !message || !sender)
       return socket.emit('status', {status: 400, message: 'Must include all fields'});
     const messageId = uuidv4(); 
@@ -47,6 +56,19 @@ io.on('connection', (socket) => {
     const db = `privateMessages:${chatId}:messages`;
     await redis.hset(db, messageId, JSON.stringify(dbData));
     socket.emit('receivePrivateMessage', {chatId, ...dbData});
+    const sendToSocket = getSocketOfSendTo(sendTo);
+    if (sendToSocket)
+      socket.to(sendToSocket).emit('receivePrivateMessage', {chatId, ...dbData});
+    else
+      console.log('Cannot find user to send message to');
+
+    let count = await redis.hget(`notifications:${sendTo}`, `sender:${sender}`);
+    count = count ? JSON.parse(count).count : 0;
+    count += 1;
+
+    const notification = {sender, count};
+    await redis.hset(`notifications:${sendTo}`, `sender:${sender}`, JSON.stringify(notification));
+    socket.to(sendToSocket).emit('new_notification', notification); 
   });
 
   socket.on('reactedToPrivateMessage', async (data) => {
