@@ -2,20 +2,19 @@
 import 'react-quill/dist/quill.snow.css'; 
 import { auth } from "../../firebase-auth/index";
 import { lazy, Suspense, useState, useEffect } from "react"
-import {useRouter} from "next/router";
+import {useRouter} from "next/navigation";
 import useAuthStore from '../../hooks/useAuthStore.js';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import React from 'react';
-
+import {useSearchParams} from 'next/navigation';
 const TextEditor = lazy(() => import('./components/text-editor'));
 
-export default function Home() {
+export default function Home({params}) {
   const [loadComponent, setLoadComponent] = useState(false);
 
-
-  const course = localStorage.getItem('variable');
-  console.log(course);
-
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const course = searchParams.get('course');
   const user = useAuthStore((state) => state.user);
   const uid = user ? user.uid : null;
 

@@ -16,10 +16,9 @@ const CoursePage = ({ params }) => {
   const [submitted, setSubmitted] = useState(false);
   const user = useAuthStore((state) => state.user);
   const uid = user ? user.uid : null;
-  
+
   const pushToDocuments = () => {
-    localStorage.setItem('variable', course);
-    router.push(`/doc`);
+    router.push(`/doc/?course=${course}`);
   };
 
   const addFile = (e) => {
