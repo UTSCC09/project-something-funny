@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const router = useRouter();
-  const courses = ["CSCC01", "CSCC09", "CSCC10", "CSCC11", "CSCC24", "CSCC37", "CSCC43", "CSCC63", 
+  const courses = ["CSCA08", "CSCA20", "CSCA48", "CSCA67", "CSCB07", "CSCB09", "CSCB20", "CSCB36",
+    "CSCB58", "CSCB63", "CSCC01", "CSCC09", "CSCC10", "CSCC11", "CSCC24", "CSCC37", "CSCC43", "CSCC63", 
     "CSCC69", "CSCC73", "CSCC85", "CSCD01", "CSCD03", "CSCD18", "CSCD27", "CSCD37", "CSCD43", "CSCD58",
     "CSCD84"];
   useEffect(() => {

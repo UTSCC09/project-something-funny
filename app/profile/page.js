@@ -150,7 +150,7 @@ export default function Messages() {
       <h1 className="text-3xl m-5">Private Messages:</h1>
 
       <DropdownMenu>
-        <DropdownMenuTrigger><p className="ml-5 border-2 rounded-sm">{'Start a New Chat'}</p></DropdownMenuTrigger>
+        <DropdownMenuTrigger><p className="ml-5 rounded-sm bg-secondary p-2">{'Start a New Chat'}</p></DropdownMenuTrigger>
         <DropdownMenuContent>
         {newUsers.map((user, idx) => (
             <div key={idx}>

@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea'; 
 import React from 'react';
 import useAuthStore from '../../../../hooks/useAuthStore';
+import Navbar from "@/components/Navbar";
 const imageExtensions = ['jpg', 'jpeg', 'png'];
 const videoExtensions = ['mp4'];
 
@@ -188,6 +189,7 @@ const PostPage = ({ params }) => {
       <Button variant="outline" onClick={() => viewAllPosts(course)} className="mb-4">
         View All Posts
       </Button>
+      <Navbar/>
       <h1 className="text-3xl font-semibold mb-2">{course}</h1>
       <Card className="mb-6">
         <div className="p-4">

@@ -139,7 +139,7 @@ export default function Messages() {
       </Button>
       <Navbar/>
       <h1 className="text-3xl m-5">Messages</h1>
-      <div className="space-y-8 border-2 rounded-md w-fit m-5">
+      <div className="space-y-8 rounded-md w-fit m-5 bg-secondary">
       <DropdownMenu>
         <DropdownMenuTrigger><p className="m-2">{'Select a Course Group Chat'}</p></DropdownMenuTrigger>
         <DropdownMenuContent>

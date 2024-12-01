@@ -1,6 +1,7 @@
 'use client'
 import Navbar from "../components/Navbar";
 import Link from "next/link";
+import "../styles/globals.css"
 import {useRouter} from "next/navigation";
 import useAuthStore from '../hooks/useAuthStore'
 import { Button } from '@/components/ui/button';

@@ -38,7 +38,7 @@ export const TextEditor = ({course}) => {
         if (quillRef.current) {
             //Loading content from Firestore
             getDoc(documentRef).then((docSnap)=> {
-                const savedContent = docSnap.data().content;
+                const savedContent = docSnap.data() ? docSnap.data().content : null;
                 if (savedContent){
                     quillRef.current.getEditor().setContents(savedContent);
                 } 
@@ -83,7 +83,7 @@ export const TextEditor = ({course}) => {
     }, []);
 
     return (
-    <div className = "google-docs-editor">
+    <div className = "google-docs-editor bg-secondary">
         {}
        <ReactQuill ref={quillRef} />
     </div>

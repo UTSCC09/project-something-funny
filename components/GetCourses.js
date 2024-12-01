@@ -98,10 +98,10 @@ export default function GetCourses() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-4">Enrolled Courses</h2>
-        <div className="flex flex-wrap gap-4">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-x-1 gap-y-4">
           {enrolledCourses.map((course, idx) => (
              <div key={course}>
-              <Button variant="primary" onClick={() => clickCourse(course)}>
+              <Button variant="secondary" onClick={() => clickCourse(course)}>
                 {course}
               </Button>
               <Button onClick={() => unenroll({uid, course})}>Unenroll</Button>
@@ -111,7 +111,7 @@ export default function GetCourses() {
       </div>
       <div>
         <h2 className="text-2xl font-semibold mb-4">All Courses</h2>
-        <div className="flex flex-wrap gap-4">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-x-1 gap-y-4">
           {remainingCourses.map((course, idx) => (
             <div key={idx}>
               <Button variant="secondary" onClick={() => clickCourse(course)}>

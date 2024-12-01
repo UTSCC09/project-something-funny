@@ -1,5 +1,6 @@
 'use client'
 import GetPosts from '@/components/GetPosts';
+import Navbar from "@/components/Navbar";
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button'; 
@@ -60,8 +61,10 @@ const CoursePage = ({ params }) => {
       <Button variant="outline" onClick={() => router.push('/courses')} className="mb-4">
         Main Menu
       </Button>
-      <h1 className="text-3xl font-semibold mb-2">{course}</h1>
-      <Button onClick={()=>pushToDocuments()}>Documents</Button>
+      <Navbar />
+      <h1 className="text-3xl font-semibold mb-4">{course}</h1>
+      <h2 className="text-2xl mb-4">Edit a Document</h2>
+      <Button className="mb-4" onClick={()=>pushToDocuments()}>Documents</Button>
       <h2 className="text-2xl mb-4">Create a Post</h2>
       <Card className="mb-6">
         <form onSubmit={handleSubmit} className="p-4">
