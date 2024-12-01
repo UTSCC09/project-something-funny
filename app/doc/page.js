@@ -1,16 +1,22 @@
 'use client'
 import 'react-quill/dist/quill.snow.css'; 
+import { auth } from "../../firebase-auth/index";
 import { lazy, Suspense, useState, useEffect } from "react"
 import {useRouter} from "next/navigation";
 import useAuthStore from '../../hooks/useAuthStore.js';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import React from 'react';
 
 const TextEditor = lazy(() => import('./components/text-editor'));
 
-export default function Home() {
+export default function Home({params}) {
   const [loadComponent, setLoadComponent] = useState(false);
   //Var to store the course name for display purposes
-  const courseName = "sample-doc";
   const router = useRouter();
+
+  //Try to pass the course here
+  const {course} = React.use(params);
+  console.log(course);
 
   const user = useAuthStore((state) => state.user);
   const uid = user ? user.uid : null;
@@ -28,7 +34,7 @@ export default function Home() {
   return (
     <div className="App">
       <header>
-        <button id="back" onClick={() => router.push('/')}>Go Back</button>
+        <button id="back" onClick={() => router.push('/courses')}>Go Back</button>
         <h1 id="CurrentCourse"> Google Docs Clone </h1>
         <link href="./styles/App.css" rel="stylesheet" key="test"/>
       </header>
@@ -38,7 +44,8 @@ export default function Home() {
       </button>
       {loadComponent && 
       (<Suspense fallback={<div>Loading...</div>}>
-        <TextEditor />
+        {/* pass the course code over here */}
+        <TextEditor course ={course} />
       </Suspense>)
       }
     </div>

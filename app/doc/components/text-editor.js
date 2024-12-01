@@ -1,13 +1,17 @@
 import ReactQuill from 'react-quill-new';
 import {useRef, useEffect, useState, useMemo} from "react";
 import { setDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
+import useAuthStore from '../../../hooks/useAuthStore.js';
 import {db} from '../../../firebase-auth/index.js';
 import {throttle} from "lodash";
 
-export const TextEditor = () => {
+export const TextEditor = ({course}) => {
 
     //Just pass the name of the document to this variable here
-    const docname = "sample-doc";
+    const docname = course;
+
+    console.log(db);
+    console.log(docname);
 
     const quillRef = useRef(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -85,4 +89,5 @@ export const TextEditor = () => {
     </div>
     );
 };
+
 export default TextEditor;

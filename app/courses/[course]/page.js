@@ -18,7 +18,7 @@ const CoursePage = ({ params }) => {
   const uid = user ? user.uid : null;
   
   const pushToDocuments = () => {
-    router.push('/doc');
+    router.push(`/doc/?course=${course}`);
   }
 
   const addFile = (e) => {
