@@ -193,12 +193,12 @@ export default function Messages() {
       <h1 className="text-3xl m-5">Private Messages:</h1>
 
       <DropdownMenu>
-        <DropdownMenuTrigger><p className="ml-5 rounded-sm bg-secondary p-2">{'Start a New Chat'}</p></DropdownMenuTrigger>
+        <DropdownMenuTrigger><p variant="outline" className="ml-5 rounded-sm bg-secondary p-2">{'Start a New Chat'}</p></DropdownMenuTrigger>
         <DropdownMenuContent>
         {newUsers.map((user, idx) => (
             <div key={idx}>
             <DropdownMenuLabel>
-              <Button key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
+              <Button variant="outline" key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             </div>
@@ -208,9 +208,9 @@ export default function Messages() {
 
       <div className="flex w-full">
         <div className="flex flex-col">
-          <p className="m-5">{'Select an Existing Chat'}</p>
+          <h2 className="m-5 text-2xl font-semibold">{'Select an Existing Chat'}</h2>
           {chatUsers.map((user, idx) => (
-            <Button className="ml-5 mb-1" key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
+            <Button variant="outline" className="ml-5 mb-1" key={idx} onClick={() => chatToUser(user.email, user.userId, null)}> {user.email} </Button>
           ))}
         </div>
 

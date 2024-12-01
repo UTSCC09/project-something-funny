@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button'; 
-import useAuthStore from '../hooks/useAuthStore'
+import useAuthStore from '../hooks/useAuthStore';
 export default function GetCourses() {
   const router = useRouter();
   const [coursesList, setCoursesList] = useState([]);
@@ -100,7 +100,7 @@ export default function GetCourses() {
         <h2 className="text-2xl font-semibold mb-4">Enrolled Courses</h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-x-1 gap-y-4">
           {enrolledCourses.map((course, idx) => (
-             <div key={course}>
+             <div key={idx}>         
               <Button variant="secondary" onClick={() => clickCourse(course)}>
                 {course}
               </Button>

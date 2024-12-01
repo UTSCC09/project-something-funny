@@ -64,7 +64,7 @@ const CoursePage = ({ params }) => {
       <Navbar />
       <h1 className="text-3xl font-semibold mb-4">{course}</h1>
       <h2 className="text-2xl mb-4">Edit a Document</h2>
-      <Button className="mb-4" onClick={()=>pushToDocuments()}>Documents</Button>
+      <Button className="mb-4" variant="outline" onClick={()=>pushToDocuments()}>Documents</Button>
       <h2 className="text-2xl mb-4">Create a Post</h2>
       <Card className="mb-6">
         <form onSubmit={handleSubmit} className="p-4">

@@ -40,7 +40,7 @@ export default function Home({params}) {
         <link href="./styles/App.css" rel="stylesheet" key="test"/>
       </header>
       {}
-      <Button idvariant="outline" id="loadDocument" onClick={handleButtonClick}>
+      <Button variant="outline" id="loadDocument" onClick={handleButtonClick}>
         Do you want to view document?
       </Button>
       {loadComponent && 
