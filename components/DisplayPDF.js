@@ -32,7 +32,7 @@ export default function DisplayPDF({ fileUrl }) {
         setPdfDocument(newPdfDocument);
         if (totalPagesRef.current)
           totalPagesRef.current.textContent = newPdfDocument.numPages;
-        renderPage(pageNumber);
+        renderPage(pageNumber, scale);
       }
       catch (error) {
         console.log(error);
@@ -50,8 +50,8 @@ export default function DisplayPDF({ fileUrl }) {
 
 
   useEffect(() => {
-    if (pdfDocument && pageNumber === 1) {
-      renderPage(pageNumber);
+    if (pdfDocument) {
+      renderPage(pageNumber, scale);
     }
   }, [pdfDocument, pageNumber, scale]);
   
@@ -65,10 +65,9 @@ export default function DisplayPDF({ fileUrl }) {
 
     pdfDocument.getPage(num).then((page) => {
       const viewport = page.getViewport({ scale });
-      const ratio = window.devicePixelRatio ? window.devicePixelRatio : 1;
-      canvas.width = viewport.width * ratio
-      canvas.height = viewport.height * ratio
-      ctx.scale(ratio, ratio);
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = viewport.width * ratio; 
+      canvas.height = viewport.height * ratio;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const renderContext = {
@@ -92,18 +91,11 @@ export default function DisplayPDF({ fileUrl }) {
       pageNumberRef.current.textContent = num;
   };
 
-  const checkRenderPage = (num) => {
-    if (pageRendering)
-      setPendingPage(num);
-    else
-      renderPage(num);
-  };
-
   const PreviousPage = () => {
     if (pageNumber > 1) {
       setPageNumber((p) => {
         const newPage = p - 1;
-        checkRenderPage(newPage);
+        renderPage(newPage);
         return newPage;
       });
     }
@@ -113,7 +105,7 @@ export default function DisplayPDF({ fileUrl }) {
     if (pdfDocument && pageNumber < pdfDocument.numPages) {
       setPageNumber((p) => {
         const newPage = p + 1;
-        checkRenderPage(newPage);
+        renderPage(newPage);
         return newPage;
       });
     }
@@ -129,10 +121,10 @@ export default function DisplayPDF({ fileUrl }) {
 
   return (
     <div className="overflow-auto" ref={containerRef}>
-      <canvas ref={canvasRef} className="w-full h-auto border rounded"></canvas>
+      <canvas ref={canvasRef} className="border rounded"></canvas>
       <div className="flex items-center space-x-2 mt-2">
-        <Button variant="secondary" onClick={zoomIn}> Zoom In </Button>
         <Button variant="secondary" onClick={zoomOut}> Zoom Out </Button>
+        <Button variant="secondary" onClick={zoomIn}> Zoom In </Button>
         <Button ref={prevButtonRef} variant="secondary" onClick={PreviousPage}>
           Previous
         </Button>
