@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/';
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { Button } from '@/components/ui/button';
 
 export default function DisplayPDF({ fileUrl }) {
