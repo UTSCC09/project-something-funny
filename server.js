@@ -39,6 +39,10 @@ app.options('*', (req, res) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.sendStatus(200);  // Respond with 200 OK to preflight requests
 });
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the server!');
+});
   
 io.on('connection', (socket) => {
 
