@@ -10,6 +10,7 @@ import useAuthStore from '../../hooks/useAuthStore'
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import ChatComponent from "./components/ChatComponent.js"
+import { throttle } from "lodash";
 
 export default function Messages() {
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function Messages() {
   }, [loading, messages]);
 
   useEffect(() => {
-    socketRef.current = io('http://34.0.41.88:5000'); 
+    socketRef.current = io('http://34.0.41.88:5000', {transports: ['websocket'], timeout: 10000}); 
     async function getAllUsers() {
       try {
         const response = await fetch(`/api/getAllUsers`);
@@ -105,7 +106,7 @@ export default function Messages() {
       checkIfChatStarted(); 
     }}, [allUsers, uid]); 
   
-  const loadMessages = async (currentChat) => {
+  const loadMessages = throttle(async (currentChat) => {
     if (loading) 
       return;
     setLoading(true);
@@ -123,7 +124,7 @@ export default function Messages() {
     finally {
       setLoading(false);
     }
-  };
+  }, 1000);
 
   const chatToUser = async (userEmail, userId, currentChat) => {
     let chatId = currentChat;
