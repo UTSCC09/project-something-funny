@@ -30,9 +30,15 @@ const io = socketIo(server, {
 app.use(cors({
     origin: ['http://localhost:3000', external_ip + ':5000'], 
     allowedHeaders: ['Content-Type'],
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
   }));
 
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.sendStatus(200);  // Respond with 200 OK to preflight requests
+});
   
 io.on('connection', (socket) => {
 
