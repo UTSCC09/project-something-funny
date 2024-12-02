@@ -43,11 +43,11 @@ export default function Home({params}) {
       <Button variant="outline" id="loadDocument" onClick={handleButtonClick}>
         Do you want to view document?
       </Button>
-      {loadComponent && 
-      (<Suspense fallback={<div>Loading...</div>}>
+      {/* {loadComponent && 
+      (<Suspense fallback={<div>Loading...</div>}> */}
         <TextEditor course = {course} />
-      </Suspense>
-      )}
+      {/* </Suspense>
+      )} */}
     </div>
   );
 };

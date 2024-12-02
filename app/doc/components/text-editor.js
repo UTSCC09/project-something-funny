@@ -86,9 +86,7 @@ export const TextEditor = ({course}) => {
     return (
     <div className = "google-docs-editor bg-secondary">
         {}
-        <Suspense>
        <ReactQuill ref={quillRef} />
-       </Suspense>
     </div>
     );
 };
