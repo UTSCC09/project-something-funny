@@ -25,7 +25,8 @@ const io = socketIo(server, {
       origin: ['http://localhost:3000', external_ip + ':3000'],
       allowedHeaders: ['Content-Type'],
       methods: ['GET', 'POST'], 
-    }
+    },
+    transports: ['websocket', 'polling'],
   });
 
 app.use(cors({
