@@ -36,13 +36,12 @@ export async function POST(request) {
     const userData = await redis.hgetall(`user:${user.uid}`);
 
     if (!userData) {
-      console.warn(`User data not found in Redis for user ID: ${user.uid}`);
       return NextResponse.json(
         {
-          message: "User data not found.",
-          status: 404,
+          message: "Unable to fetch user data. Please try again later.",
+          status: 500,
         },
-        { status: 404 }
+        { status: 500 }
       );
     }
 
@@ -53,20 +52,13 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Error during email sign-in:", error);
-
-    let status = 400;
-    if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-      status = 401;
-    } else if (error.code === "auth/too-many-requests") {
-      status = 429;
-    }
-
+    // Generic error message for users
     return NextResponse.json(
       {
-        message: `Error during email sign-in: ${error.message}`,
-        status,
+        message: "Unable to sign in. Please check your credentials.",
+        status: 401,
       },
-      { status }
+      { status: 401 }
     );
   }
 }
