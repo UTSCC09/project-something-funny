@@ -23,15 +23,6 @@ const nextConfig = {
               key: 'Access-Control-Allow-Credentials',
               value: 'true',
             },
-            {
-              source: '/uploads/(.*)', // Match all files in /uploads
-              headers: [
-                {
-                  key: 'Cache-Control',
-                  value: 'public, max-age=31536000, immutable', // Set caching for images
-                },
-              ],
-            },
           ],
         },
       ];
