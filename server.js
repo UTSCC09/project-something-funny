@@ -132,6 +132,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(5000, () => {
+server.listen(5000, '0.0.0.0', () => {
   console.log('Backend is running on port 5000');
 });
