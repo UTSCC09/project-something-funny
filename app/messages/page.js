@@ -27,7 +27,7 @@ export default function Messages() {
   const uid = user ? user.uid : null;
   
   useEffect(() => {
-    socketRef.current = io('http://localhost:5000'); 
+    socketRef.current = io('http://localhost:5000', {transports: ['websocket', 'polling']}); 
     async function getEnrolledCourses() {
       try {
         const response = await fetch(`/api/getEnrolledCourses?uid=${uid}`, {
