@@ -36,7 +36,7 @@ app.use(cors({
   }));
 
 app.options('*', cors({
-    origin: allowedOrigins,
+    origin: ['http://localhost:3000', external_ip + ':3000'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
