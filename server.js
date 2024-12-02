@@ -22,13 +22,13 @@ const redis = new Redis({
 
 const io = socketIo(server, {
     cors: {
-      origin: ['http://localhost:3000', external_ip],
+      origin: ['http://localhost:3000', external_ip + ':5000'],
       methods: ['GET', 'POST'], 
     }
   });
 
 app.use(cors({
-    origin: ['http://localhost:3000', external_ip], 
+    origin: ['http://localhost:3000', external_ip + ':5000'], 
     allowedHeaders: ['Content-Type'],
     methods: ['GET', 'POST'],
   }));
@@ -132,6 +132,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(5000, () => {
+server.listen(5000, '0.0.0.0', () => {
   console.log('Backend is running on port 5000');
 });
