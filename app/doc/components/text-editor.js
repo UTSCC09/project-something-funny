@@ -84,12 +84,12 @@ export const TextEditor = ({course}) => {
     }, []);
 
     return (
-    <Suspense>
     <div className = "google-docs-editor bg-secondary">
         {}
+        <Suspense>
        <ReactQuill ref={quillRef} />
+       </Suspense>
     </div>
-    </Suspense>
     );
 };
 
