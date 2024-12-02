@@ -78,7 +78,12 @@ export default function Messages() {
   const joinCourse = async (course) => {
     setCurrentCourse(course);
     socketRef.current.emit('joinCourse', course);
-    const response = await fetch(`/api/getMessages?course=${course}&index=0`);
+    const response = await fetch(`/api/getMessages?course=${course}&index=0`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     if (response.ok) {
       const data = await response.json();
       setIndex(1);
@@ -92,7 +97,12 @@ export default function Messages() {
       return;
     setLoading(true);
     try {
-      const response = await fetch(`/api/getMessages?course=${course}&index=${index}`);
+      const response = await fetch(`/api/getMessages?course=${course}&index=${index}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setIndex(index+1);

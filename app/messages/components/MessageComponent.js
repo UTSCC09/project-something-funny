@@ -5,6 +5,8 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea'; 
 import Dateformatter from './DateFormatter.js'
 import io from 'socket.io-client';
+import { method } from 'lodash';
+import { headers } from 'next/headers.js';
 
 const MessageComponent = ({messageId, course, message, date, sender, initialReactions, currentUser, originalMessage,
   originalSender, originalMessageId, replied, socket, editStatus}) => {
@@ -30,7 +32,9 @@ const MessageComponent = ({messageId, course, message, date, sender, initialReac
   useEffect(() => {
     const fetchReactions = async () => {
       try {
-        const response = await fetch(`/api/submitReaction?messageId=${messageId}&course=${course}`);
+        const response = await fetch(`/api/submitReaction?messageId=${messageId}&course=${course}`, {method: 'GET', headers: {
+          'Content-Type': 'application/json',
+        }});
         const data = await response.json();
         if (response.ok)
           setReactions(data.reactions);
