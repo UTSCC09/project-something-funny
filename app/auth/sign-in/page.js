@@ -101,8 +101,8 @@ const SignIn = () => {
           </Button>
 
           <div>
-            Don't have an account?
-            <Link href="/auth/sign-up" className='ml-2 text-blue-600 hover:underline'>
+            Don&apos;t have an account?
+            <Link href="/auth/sign-up" className="ml-2 text-blue-600 hover:underline">
               Sign up!
             </Link>
           </div>
