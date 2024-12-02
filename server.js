@@ -10,7 +10,7 @@ const {v4: uuidv4} = require('uuid');
 const allSockets = {};
 
 // external ip address
-const external_ip = 'http://34.0.41.88';
+const external_ip = 'http://34.0.39.215';
 function getSocketOfSendTo(userId) {
   return allSockets[userId];
 }

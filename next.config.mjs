@@ -9,7 +9,7 @@ const nextConfig = {
           headers: [
             {
               key: 'Access-Control-Allow-Origin',
-              value: '*', // Change '*' to specific origins if needed, e.g., 'http://34.0.41.88:3000'
+              value: '*', 
             },
             {
               key: 'Access-Control-Allow-Methods',

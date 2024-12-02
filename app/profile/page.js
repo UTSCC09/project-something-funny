@@ -51,7 +51,7 @@ export default function Messages() {
   }, [loading, messages]);
 
   useEffect(() => {
-    socketRef.current = io('http://34.0.41.88:5000', {transports: ['websocket'], timeout: 10000}); 
+    socketRef.current = io('http://34.0.39.215:5000', {transports: ['websocket'], timeout: 10000}); 
     async function getAllUsers() {
       try {
         const response = await fetch(`/api/getAllUsers`);
