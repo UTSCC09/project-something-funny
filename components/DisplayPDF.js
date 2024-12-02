@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
+/* import * as pdfjsLib from 'pdfjs-dist'; */
+import { pdfjs } from 'react-pdf';
 import { Button } from '@/components/ui/button';
 
 export default function DisplayPDF({ fileUrl }) {
@@ -18,12 +19,13 @@ export default function DisplayPDF({ fileUrl }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+    pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+    /* pdfjs.GlobalWorkerOptions.workerSrc = '//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js'; */
     const loadPDF = async () => {
       try {
         if (loadingTask)
           loadingTask.cancel(); 
-        const newLoadingTask = pdfjsLib.getDocument({url:fileUrl});
+        const newLoadingTask = pdfjs.getDocument({url:fileUrl});
         setLoadingTask(newLoadingTask); 
 
         const newPdfDocument = await newLoadingTask.promise;
