@@ -50,7 +50,7 @@ export default function Messages() {
   }, [loading, messages]);
 
   useEffect(() => {
-    socketRef.current = io('http://localhost:5000'); 
+    socketRef.current = io(/* 'http://localhost:5000' */ 'http://34.0.41.88:5000'); 
     async function getAllUsers() {
       try {
         const response = await fetch(`/api/getAllUsers`);

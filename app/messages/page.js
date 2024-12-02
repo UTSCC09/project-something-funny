@@ -29,7 +29,7 @@ export default function Messages() {
   const uid = user ? user.uid : null;
   
   useEffect(() => {
-    socketRef.current = io(/* 'http://localhost:5000', */ 'http://34.0.41.88:5000', {transports: ['websocket', 'polling'], timeout: 10000}); 
+    socketRef.current = io(/* 'http://localhost:5000', */ 'http://34.0.41.88:5000', {transports: ['websocket'], timeout: 10000}); 
     async function getEnrolledCourses() {
       try {
         const response = await fetch(`/api/getEnrolledCourses?uid=${uid}`, {
@@ -93,7 +93,6 @@ export default function Messages() {
     }
   };
 
-
   const loadMessages = throttle(async (course) => {
     if (loading) 
       return;
@@ -118,13 +117,6 @@ export default function Messages() {
       setLoading(false);
     }
   }, 1000);
-
-  /* const throttledLoadMessage = useCallback(
-    throttle((course) => {
-    loadMessages(course);
-  }, 1000), 
-  [loading, index]
-); */
 
   const sendMessage = () => {
     if (newMessage) {

@@ -26,7 +26,7 @@ const io = socketIo(server, {
       allowedHeaders: ['Content-Type'],
       methods: ['GET', 'POST'], 
     },
-    transports: ['websocket', 'polling'],
+    transports: ['websocket'],
   });
 
 app.use(cors({
@@ -35,7 +35,6 @@ app.use(cors({
     methods: ['GET', 'POST'],
   }));
 
-  
 io.on('connection', (socket) => {
 
   socket.on('joinCourse', (course) => {
@@ -131,6 +130,10 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
+  });
+
+  socket.on('reconnect', () => {
+    console.log('Reconnected to the server');
   });
 });
 
