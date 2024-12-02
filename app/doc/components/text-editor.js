@@ -32,7 +32,7 @@ export const TextEditor = ({course}) => {
 
             isLocalChange.current = false;
         }
-    }, 1000);
+    }, 500);
 
     useEffect (() => {
         if (quillRef.current) {

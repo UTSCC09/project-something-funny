@@ -24,22 +24,15 @@ const io = socketIo(server, {
     cors: {
       origin: ['http://localhost:3000', external_ip + ':3000'],
       methods: ['GET', 'POST'], 
-      credentials: true,
     }
   });
 
 app.use(cors({
     origin: ['http://localhost:3000', external_ip + ':3000'], 
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: ['GET', 'POST', 'OPTIONS'],
-    credentials: true,
+    allowedHeaders: ['Content-Type'],
+    methods: ['GET', 'POST'],
   }));
 
-app.options('*', cor());
-
-app.get('/', (req, res) => {
-  res.send('Welcome to the server!');
-});
   
 io.on('connection', (socket) => {
 
