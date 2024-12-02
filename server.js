@@ -22,23 +22,25 @@ const redis = new Redis({
 
 const io = socketIo(server, {
     cors: {
-      origin: ['*'/* 'http://localhost:3000', external_ip + ':3000' */],
+      origin: ['http://localhost:3000', external_ip + ':3000'],
       methods: ['GET', 'POST'], 
+      credentials: true,
     }
   });
 
 app.use(cors({
-    origin: ['*'/* 'http://localhost:3000', external_ip + ':3000' */], 
+    origin: ['http://localhost:3000', external_ip + ':3000'], 
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true,
   }));
 
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.sendStatus(200);  // Respond with 200 OK to preflight requests
-});
+app.options('*', cors({
+    origin: allowedOrigins,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true,
+}));
 
 app.get('/', (req, res) => {
   res.send('Welcome to the server!');
