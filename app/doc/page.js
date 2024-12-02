@@ -15,7 +15,7 @@ export default function Home({params}) {
   const [loadComponent, setLoadComponent] = useState(false);
 
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
   const course = searchParams.get('course');
   const user = useAuthStore((state) => state.user);
   const uid = user ? user.uid : null;
