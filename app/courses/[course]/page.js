@@ -2,7 +2,7 @@
 import GetPosts from '@/components/GetPosts';
 import Navbar from "@/components/Navbar";
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button'; 
 import { Card } from '@/components/ui/card'; 
 import { Textarea } from '@/components/ui/textarea'; 
@@ -18,6 +18,7 @@ const CoursePage = ({ params }) => {
   const user = useAuthStore((state) => state.user);
   const uid = user ? user.uid : null;
 
+  const fileRef = useRef(null);
   const pushToDocuments = () => {
     router.push(`/doc/?course=${course}`);
   };
@@ -47,6 +48,7 @@ const CoursePage = ({ params }) => {
         setText('');
         setFile(null);
         setSubmitted(true);
+        fileRef.current.value = ""; 
       }
     } catch (error) {
 
@@ -82,6 +84,7 @@ const CoursePage = ({ params }) => {
               type="file"
               accept="video/*,image/*,application/pdf"
               onChange={addFile}
+              ref={fileRef}
             />
             <Button type="submit">Submit</Button>
           </div>
