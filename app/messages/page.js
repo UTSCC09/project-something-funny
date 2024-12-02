@@ -119,12 +119,12 @@ export default function Messages() {
     }
   }, 1000);
 
-  const throttledLoadMessage = useCallback(
+  /* const throttledLoadMessage = useCallback(
     throttle((course) => {
     loadMessages(course);
   }, 1000), 
   [loading, index]
-);
+); */
 
   const sendMessage = () => {
     if (newMessage) {
