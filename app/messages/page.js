@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import useAuthStore from '../../hooks/useAuthStore'
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import { useCallback } from "react";
+import { throttle } from "lodash";
 
 export default function Messages() {
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -92,7 +94,7 @@ export default function Messages() {
   };
 
 
-  const loadMessages = async (course) => {
+  const loadMessages = throttle(async (course) => {
     if (loading) 
       return;
     setLoading(true);
@@ -115,7 +117,14 @@ export default function Messages() {
     finally {
       setLoading(false);
     }
-  };
+  }, 1000);
+
+  const throttledLoadMessage = useCallback(
+    throttle((course) => {
+    loadMessages(course);
+  }, 1000), 
+  [loading, index]
+);
 
   const sendMessage = () => {
     if (newMessage) {
