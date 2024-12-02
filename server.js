@@ -29,7 +29,7 @@ const io = socketIo(server, {
 
 app.use(cors({
     origin: ['*'/* 'http://localhost:3000', external_ip + ':3000' */], 
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'OPTIONS'],
   }));
 
