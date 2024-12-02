@@ -4,6 +4,7 @@ import { setDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
 import useAuthStore from '../../../hooks/useAuthStore.js';
 import {db} from '../../../firebase-auth/index.js';
 import {throttle} from "lodash";
+import { Suspense } from 'react';
 
 export const TextEditor = ({course}) => {
 
@@ -83,10 +84,12 @@ export const TextEditor = ({course}) => {
     }, []);
 
     return (
+    <Suspense>
     <div className = "google-docs-editor bg-secondary">
         {}
        <ReactQuill ref={quillRef} />
     </div>
+    </Suspense>
     );
 };
 
