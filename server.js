@@ -23,6 +23,7 @@ const redis = new Redis({
 const io = socketIo(server, {
     cors: {
       origin: ['http://localhost:3000', external_ip + ':3000'],
+      allowedHeaders: ['Content-Type'],
       methods: ['GET', 'POST'], 
     }
   });
