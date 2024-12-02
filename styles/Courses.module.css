@@ -1,0 +1,36 @@
+.course_button {
+    width: 100%;
+    margin-top: 10px;
+    padding-left: 40px;
+    padding-right: 40px;
+    height: 40px;
+  }
+  .grid_layout {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+  }
+  .input_box {
+    margin-top: 5px;
+    padding: 5px;
+    width: 50%;
+    height: 60px;
+  }
+
+  .flex_layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .submit_button {
+    width: 50%;
+    margin: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .file_button {
+    margin: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
